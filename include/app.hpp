@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameWindow.hpp"
+#include "pipeline.hpp"
 
 namespace engine 
 {
@@ -14,5 +15,6 @@ namespace engine
 
         private:
             gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
+            pipeline pipeline{"shaders/simple_shaders.vert.spv", "shaders/simple_shaders.frag.spv"};
     };
 }
