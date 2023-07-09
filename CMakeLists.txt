@@ -58,6 +58,7 @@ endif()
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
