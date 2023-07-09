@@ -4,6 +4,7 @@
 #include "pipeline.hpp"
 #include "engineDevice.hpp"
 #include "swapChain.hpp"
+#include "engineModel.hpp"
 
 
 #include <memory>
@@ -33,9 +34,11 @@ namespace engine
             void createPipeline();
             void createCommandBuffers();
             void drawFrame();
+            void loadModels();
 
             std::unique_ptr<pipeline> p_pipeline;
             VkPipelineLayout pipelineLayout;
-            std::vector<VkCommandBuffer> commandBuffers;            
+            std::vector<VkCommandBuffer> commandBuffers;  
+            std::unique_ptr<engineModel> model;          
     };
 }
