@@ -20,6 +20,7 @@ namespace engine
         struct Vertex
         {
             glm::vec2 position;
+            glm::vec3 color;
 
             static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
             static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
@@ -32,7 +33,7 @@ namespace engine
 
         void bind(VkCommandBuffer commandBuffer);
         void draw(VkCommandBuffer commandBuffer);
-        
+
     private:
         engineDevice& device;
         VkBuffer vertexBuffer;
