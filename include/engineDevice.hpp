@@ -36,9 +36,9 @@ public:
 
     // Not copyable or movable
     engineDevice(const engineDevice &) = delete;
-    void operator=(const engineDevice &) = delete;
+    engineDevice& operator=(const engineDevice &) = delete;
     engineDevice(engineDevice &&) = delete;
-    engineDevice &operator=(engineDevice &&) = delete;
+    engineDevice& operator=(engineDevice &&) = delete;
 
     VkCommandPool getCommandPool() { return commandPool; }
     VkDevice device() { return device_; }

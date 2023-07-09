@@ -27,15 +27,18 @@ namespace engine
             void run();
 
         private:
-            gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
-            engineDevice device{window};
-            swapChain swapChain{device, window.getExtent()};
             void createPipelineLayout();
             void createPipeline();
             void createCommandBuffers();
+            void freeCommandBuffers();
             void drawFrame();
             void loadModels();
+            void recreateSwapChain();
+            void recordCommandBuffer(int imageIndex);
 
+            gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
+            engineDevice device{window};
+            std::unique_ptr<swapChain> p_swapChain;
             std::unique_ptr<pipeline> p_pipeline;
             VkPipelineLayout pipelineLayout;
             std::vector<VkCommandBuffer> commandBuffers;  

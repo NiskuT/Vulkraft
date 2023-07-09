@@ -10,14 +10,19 @@ namespace engine
 
     struct pipelineConfigInfo
     {
-        VkViewport viewport;
-        VkRect2D scissor;
+        pipelineConfigInfo() = default;
+        pipelineConfigInfo(const pipelineConfigInfo&) = delete;
+        pipelineConfigInfo operator=(const pipelineConfigInfo&) = delete;
+
+        VkPipelineViewportStateCreateInfo viewportInfo;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo multisampleInfo;
         VkPipelineColorBlendAttachmentState colorBlendAttachment;
         VkPipelineColorBlendStateCreateInfo colorBlendInfo;
         VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+        std::vector<VkDynamicState> dynamicStateEnables;
+        VkPipelineDynamicStateCreateInfo dynamicStateInfo;
         VkPipelineLayout pipelineLayout = nullptr;
         VkRenderPass renderPass = nullptr;
         uint32_t subpass = 0;
@@ -48,12 +53,13 @@ namespace engine
                 const pipelineConfigInfo& configInfo);
 
             ~pipeline();
+            pipeline() = default;
 
             pipeline(const pipeline&) = delete;
-            void operator=(const pipeline&) = delete;
+            pipeline& operator=(const pipeline&) = delete;
 
             void bind(VkCommandBuffer commandBuffer);
-            static pipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+            static void defaultPipelineConfigInfo(pipelineConfigInfo& configInfo);
     };
     
 } // namespace engine
