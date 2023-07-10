@@ -22,6 +22,7 @@ namespace engine
             void operator=(const renderer&) = delete;
 
             VkRenderPass getSwapChainRenderPass() const { return p_swapChain->getRenderPass(); }
+            float getAspectRatio() const { return p_swapChain->extentAspectRatio(); }
             bool isFrameInProgress() const { return isFrameStarted; }
             
             VkCommandBuffer getCurrentCommandBuffer() const { 

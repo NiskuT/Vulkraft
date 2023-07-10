@@ -62,7 +62,7 @@ namespace engine
         p_pipeline = std::make_unique<pipeline>(device, "shaders/simple_shaders.vert.spv", "shaders/simple_shaders.frag.spv", pipelineConfig);
     }
 
-    void renderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<gameObject>& gameObjects)
+    void renderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<gameObject>& gameObjects, const camera& myCamera)
     {
         p_pipeline->bind(commandBuffer);
 
@@ -73,7 +73,7 @@ namespace engine
 
             SimplePushConstantData push{};
             push.color = obj.color;
-            push.transform = obj.transform.mat4();
+            push.transform = myCamera.getProjectionMatrix() *  obj.transform.mat4();
 
             vkCmdPushConstants(
                 commandBuffer,

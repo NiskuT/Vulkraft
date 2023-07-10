@@ -1,6 +1,7 @@
 #include "app.hpp"
 
 #include "renderSystem.hpp"
+#include "camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -23,15 +24,20 @@ namespace engine
     void app::run()
     {
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass()};
-
+        camera myCamera{};
+        
         while(!window.shouldClose())
         {
             glfwPollEvents();
-            
+
+            float aspect = engineRenderer.getAspectRatio();
+            myCamera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+            myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 10.f);
+
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
                 engineRenderer.beginSwapChainRenderPass(commandBuffer);
-                renderSystem.renderGameObjects(commandBuffer, gameObjects);
+                renderSystem.renderGameObjects(commandBuffer, gameObjects, myCamera);
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
 
@@ -105,7 +111,7 @@ namespace engine
         auto cube = gameObject::createGameObject();
         cube.model = cubeModel;
 
-        cube.transform.translation = {0.0f, 0.0f, .5f};
+        cube.transform.translation = {0.0f, 0.0f, 2.5f};
         cube.transform.scale = {.5f, .5f, .5f};
 
         gameObjects.push_back(std::move(cube));
