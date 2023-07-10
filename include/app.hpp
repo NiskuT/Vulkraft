@@ -5,6 +5,7 @@
 #include "engineDevice.hpp"
 #include "swapChain.hpp"
 #include "engineModel.hpp"
+#include "gameObject.hpp"
 
 
 #include <memory>
@@ -32,9 +33,10 @@ namespace engine
             void createCommandBuffers();
             void freeCommandBuffers();
             void drawFrame();
-            void loadModels();
+            void loadGameObjects();
             void recreateSwapChain();
             void recordCommandBuffer(int imageIndex);
+            void renderGameObject(VkCommandBuffer commandBuffer);
 
             gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
             engineDevice device{window};
@@ -42,6 +44,6 @@ namespace engine
             std::unique_ptr<pipeline> p_pipeline;
             VkPipelineLayout pipelineLayout;
             std::vector<VkCommandBuffer> commandBuffers;  
-            std::unique_ptr<engineModel> model;          
+            std::vector<gameObject> gameObjects;          
     };
 }
