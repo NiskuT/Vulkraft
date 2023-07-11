@@ -25,6 +25,8 @@ namespace engine
     {
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass()};
         camera myCamera{};
+        //myCamera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
+        myCamera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
         
         while(!window.shouldClose())
         {
