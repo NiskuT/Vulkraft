@@ -66,12 +66,12 @@ namespace engine
 
     void app::loadGameObjects()
     {
-        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\smooth_vase.obj");
+        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\flat_vase.obj");
         auto gameObj = gameObject::createGameObject();
         gameObj.model = gameObjModel;
 
-        gameObj.transform.translation = {0.0f, 0.0f, 2.5f};
-        gameObj.transform.scale = glm::vec3(3.0f);
+        gameObj.transform.translation = {0.0f, 0.5f, 2.5f};
+        gameObj.transform.scale = glm::vec3(3.0f, 2.0f, 1.0f);
 
         gameObjects.push_back(std::move(gameObj));
     }
