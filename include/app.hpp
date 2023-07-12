@@ -4,6 +4,7 @@
 #include "engineDevice.hpp"
 #include "gameObject.hpp"
 #include "renderer.hpp"
+#include "descriptors.hpp"
 
 
 #include <memory>
@@ -31,6 +32,9 @@ namespace engine
             gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
             engineDevice device{window};
             renderer engineRenderer{window, device};
+
+            // Order of declaration is important here
+            std::unique_ptr<engineDescriptorPool> globalPool{};
             std::vector<gameObject> gameObjects;          
     };
 }
