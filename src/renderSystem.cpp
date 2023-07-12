@@ -62,11 +62,11 @@ namespace engine
         p_pipeline = std::make_unique<pipeline>(device, "shaders/simple_shaders.vert.spv", "shaders/simple_shaders.frag.spv", pipelineConfig);
     }
 
-    void renderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<gameObject>& gameObjects, const camera& myCamera)
+    void renderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<gameObject>& gameObjects)
     {
-        p_pipeline->bind(commandBuffer);
+        p_pipeline->bind(frameInfo.commandBuffer);
 
-        auto projectionView = myCamera.getProjectionMatrix() * myCamera.getViewMatrix();
+        auto projectionView = frameInfo.camera.getProjectionMatrix() * frameInfo.camera.getViewMatrix();
 
         for (auto& obj : gameObjects)
         {
@@ -76,14 +76,14 @@ namespace engine
             push.normalMatrix = obj.transform.normalMatrix();
 
             vkCmdPushConstants(
-                commandBuffer,
+                frameInfo.commandBuffer,
                 pipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
                 sizeof(SimplePushConstantData),
                 &push);
-            obj.model->bind(commandBuffer);
-            obj.model->draw(commandBuffer);
+            obj.model->bind(frameInfo.commandBuffer);
+            obj.model->draw(frameInfo.commandBuffer);
         }
     }
 

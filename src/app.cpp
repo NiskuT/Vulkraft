@@ -3,6 +3,7 @@
 #include "renderSystem.hpp"
 #include "camera.hpp"
 #include "keyboardController.hpp"
+#include "vulkanBuffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -17,6 +18,11 @@
 
 namespace engine 
 {
+    struct GlobalUbo
+    {
+        glm::mat4 projectionView{1.0f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, -3.0f, -1.0f));
+    };
     
     app::app()
     {
@@ -27,6 +33,19 @@ namespace engine
     
     void app::run()
     {
+        std::vector<std::unique_ptr<vulkanBuffer>> uboBuffers(swapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i =0; i< uboBuffers.size(); i++)
+        {
+            uboBuffers[i] = std::make_unique<vulkanBuffer>(
+                device,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            );
+            uboBuffers[i]->map();
+        }
+
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass()};
         camera myCamera{};
         myCamera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
@@ -55,8 +74,18 @@ namespace engine
 
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
+                int frameIndex = engineRenderer.getFrameIndex();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera};
+
+                // update
+                GlobalUbo ubo{};
+                ubo.projectionView = myCamera.getProjectionMatrix() * myCamera.getViewMatrix();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
+
+                //render
                 engineRenderer.beginSwapChainRenderPass(commandBuffer);
-                renderSystem.renderGameObjects(commandBuffer, gameObjects, myCamera);
+                renderSystem.renderGameObjects(frameInfo, gameObjects);
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
 
