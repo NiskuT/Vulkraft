@@ -21,6 +21,7 @@ namespace engine
             pointLightSystem(const pointLightSystem&) = delete;
             void operator=(const pointLightSystem&) = delete;
 
+            void update(FrameInfo& frameInfo, GlobalUbo& ubo);
             void render(FrameInfo& frameInfo);
 
         private:

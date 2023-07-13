@@ -2,7 +2,7 @@
 
 namespace engine
 {
-    glm::mat4 engine::TransformComponent::mat4() 
+    glm::mat4 TransformComponent::mat4() 
     {
         const float c3 = glm::cos(rotation.z);
         const float s3 = glm::sin(rotation.z);
@@ -33,7 +33,7 @@ namespace engine
             {translation.x, translation.y, translation.z, 1.0f}};
     }
 
-    glm::mat3 engine::TransformComponent::normalMatrix() 
+    glm::mat3 TransformComponent::normalMatrix() 
     {
         const float c3 = glm::cos(rotation.z);
         const float s3 = glm::sin(rotation.z);
@@ -60,5 +60,15 @@ namespace engine
                 invScale.z * (c1 * c2),
             }
         };        
+    }
+
+    gameObject gameObject::makePointLight(float lightIntensity, float radius, glm::vec3 color)
+    {
+        gameObject gameObj = gameObject::createGameObject();
+        gameObj.color = color;
+        gameObj.transform.scale.x = radius;
+        gameObj.pointLight = std::make_unique<PointLightComponent>();
+        gameObj.pointLight->lightIntensity = lightIntensity;
+        return gameObj;
     }
 }
