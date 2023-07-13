@@ -53,7 +53,7 @@ namespace engine
         }
 
         auto globalSetLayout = engineDescriptorSetLayout::Builder(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(swapChain::MAX_FRAMES_IN_FLIGHT);
@@ -94,7 +94,7 @@ namespace engine
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
                 int frameIndex = engineRenderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex]};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex], gameObjects};
 
                 // update
                 GlobalUbo ubo{};
@@ -104,7 +104,7 @@ namespace engine
 
                 //render
                 engineRenderer.beginSwapChainRenderPass(commandBuffer);
-                renderSystem.renderGameObjects(frameInfo, gameObjects);
+                renderSystem.renderGameObjects(frameInfo);
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
 
@@ -122,13 +122,13 @@ namespace engine
         gameObj.transform.translation = {0.5f, 0.5f, 0.0f};
         gameObj.transform.scale = glm::vec3(3.0f, 1.5f, 3.0f);
 
-        gameObjects.push_back(std::move(gameObj));
+        gameObjects.emplace(gameObj.getId(), std::move(gameObj));
 
         gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
         auto floor = gameObject::createGameObject();
         floor.model = gameObjModel;
         floor.transform.translation = {0.f, .5f, 0.f};
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
-        gameObjects.push_back(std::move(floor));
+        gameObjects.emplace(floor.getId(), std::move(floor));
     }
 } // namespace engine

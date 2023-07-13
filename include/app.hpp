@@ -35,6 +35,6 @@ namespace engine
 
             // Order of declaration is important here
             std::unique_ptr<engineDescriptorPool> globalPool{};
-            std::vector<gameObject> gameObjects;          
+            gameObject::Map gameObjects;          
     };
 }

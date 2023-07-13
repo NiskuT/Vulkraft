@@ -64,7 +64,7 @@ namespace engine
         p_pipeline = std::make_unique<pipeline>(device, "shaders/simple_shaders.vert.spv", "shaders/simple_shaders.frag.spv", pipelineConfig);
     }
 
-    void renderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<gameObject>& gameObjects)
+    void renderSystem::renderGameObjects(FrameInfo& frameInfo)
     {
         p_pipeline->bind(frameInfo.commandBuffer);
 
@@ -78,8 +78,13 @@ namespace engine
             0,
             nullptr);
 
-        for (auto& obj : gameObjects)
+        for (auto& kv : frameInfo.gameObjects)
         {
+            auto& obj = kv.second;
+            if (obj.model == nullptr)
+            {
+                continue;
+            }
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
             push.normalMatrix = obj.transform.normalMatrix();
