@@ -7,6 +7,8 @@
 
 #include <stdexcept>
 #include <array>
+#include <cassert>
+#include <map>
 
 namespace engine 
 {
@@ -58,6 +60,7 @@ namespace engine
 
         pipelineConfigInfo pipelineConfig{};
         pipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipeline::enableAlphaBlending(pipelineConfig);
         pipelineConfig.attributeDescriptions.clear();
         pipelineConfig.bindingDescriptions.clear();
 
@@ -90,6 +93,19 @@ namespace engine
 
     void pointLightSystem::render(FrameInfo& frameInfo)
     {
+        // sort lights by distance to camera
+        std::map<float, gameObject::id_t> sorted;
+        for (auto& kv: frameInfo.gameObjects)
+        {
+            auto& gameObject = kv.second;
+            if (gameObject.pointLight == nullptr) continue;
+
+            // calculate distance to camera
+            auto offset = frameInfo.camera.getPosition() - gameObject.transform.translation;
+            float disSquared = glm::dot(offset, offset);
+            sorted[disSquared] = gameObject.getId();
+        }
+
         p_pipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(
@@ -102,10 +118,11 @@ namespace engine
             0,
             nullptr);
 
-        for (auto& kv: frameInfo.gameObjects)
+        // iterate through sorted lights in reverse order
+        for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
-            auto& gameObject = kv.second;
-            if (gameObject.pointLight == nullptr) continue;
+            // use game object id to find the light object
+            auto& gameObject = frameInfo.gameObjects.at(it->second);
 
             PointLightPushConstants push{};
             push.position = glm::vec4(gameObject.transform.translation, 1.0f);

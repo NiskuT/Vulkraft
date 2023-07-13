@@ -19,6 +19,7 @@ namespace engine
         const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
         const glm::mat4& getViewMatrix() const { return viewMatrix; }
         const glm::mat4& getViewInverseMatrix() const { return viewInverseMatrix; }
+        const glm::vec3 getPosition() const { return glm::vec3(viewInverseMatrix[3]); }
 
     private:
         glm::mat4 projectionMatrix{1.0f};

@@ -62,6 +62,7 @@ namespace engine
 
             void bind(VkCommandBuffer commandBuffer);
             static void defaultPipelineConfigInfo(pipelineConfigInfo& configInfo);
+            static void enableAlphaBlending(pipelineConfigInfo& configInfo);
     };
     
 } // namespace engine

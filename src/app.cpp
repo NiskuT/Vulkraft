@@ -101,8 +101,12 @@ namespace engine
 
                 //render
                 engineRenderer.beginSwapChainRenderPass(commandBuffer);
+
+                // order matters
                 renderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
+
+                
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
 
