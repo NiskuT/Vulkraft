@@ -94,6 +94,7 @@ namespace engine
                 GlobalUbo ubo{};
                 ubo.projection = myCamera.getProjectionMatrix();
                 ubo.view = myCamera.getViewMatrix();
+                ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
