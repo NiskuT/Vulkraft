@@ -21,7 +21,9 @@ namespace engine
     struct GlobalUbo
     {
         glm::mat4 projectionView{1.0f};
-        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.0f, -3.0f, -1.0f));
+        glm::vec4 ambientLightColor{0.1f, 0.1f, 0.1f, 0.02f}; // w is the ambient light intensity
+        glm::vec3 lightPositon{-1.0f};
+        alignas(16) glm::vec4 lightColor{1.0f}; // w is the light intensity
     };
     
     app::app()
@@ -87,7 +89,7 @@ namespace engine
 
             float aspect = engineRenderer.getAspectRatio();
             myCamera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-            myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 10.f);
+            myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 100.f);
 
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
@@ -112,13 +114,21 @@ namespace engine
 
     void app::loadGameObjects()
     {
-        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\flat_vase.obj");
+        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\smooth_vase.obj");
         auto gameObj = gameObject::createGameObject();
+        gameObj.transform.translation.z = -2.5f;
         gameObj.model = gameObjModel;
 
-        gameObj.transform.translation = {0.0f, 0.5f, 2.5f};
-        gameObj.transform.scale = glm::vec3(3.0f, 2.0f, 1.0f);
+        gameObj.transform.translation = {0.5f, 0.5f, 0.0f};
+        gameObj.transform.scale = glm::vec3(3.0f, 1.5f, 3.0f);
 
         gameObjects.push_back(std::move(gameObj));
+
+        gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
+        auto floor = gameObject::createGameObject();
+        floor.model = gameObjModel;
+        floor.transform.translation = {0.f, .5f, 0.f};
+        floor.transform.scale = {3.0f, 1.0f, 3.0f};
+        gameObjects.push_back(std::move(floor));
     }
 } // namespace engine
