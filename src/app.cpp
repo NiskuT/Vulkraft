@@ -1,6 +1,7 @@
 #include "app.hpp"
 
-#include "renderSystem.hpp"
+#include "systems/renderSystem.hpp"
+#include "systems/pointLightSystem.hpp"
 #include "camera.hpp"
 #include "keyboardController.hpp"
 #include "vulkanBuffer.hpp"
@@ -20,7 +21,8 @@ namespace engine
 {
     struct GlobalUbo
     {
-        glm::mat4 projectionView{1.0f};
+        glm::mat4 projection{1.0f};
+        glm::mat4 view{1.0f};
         glm::vec4 ambientLightColor{0.1f, 0.1f, 0.1f, 0.02f}; // w is the ambient light intensity
         glm::vec3 lightPositon{-1.0f};
         alignas(16) glm::vec4 lightColor{1.0f}; // w is the light intensity
@@ -66,6 +68,7 @@ namespace engine
         }
 
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         camera myCamera{};
         myCamera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
@@ -98,13 +101,15 @@ namespace engine
 
                 // update
                 GlobalUbo ubo{};
-                ubo.projectionView = myCamera.getProjectionMatrix() * myCamera.getViewMatrix();
+                ubo.projection = myCamera.getProjectionMatrix();
+                ubo.view = myCamera.getViewMatrix();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 //render
                 engineRenderer.beginSwapChainRenderPass(commandBuffer);
                 renderSystem.renderGameObjects(frameInfo);
+                pointLightSystem.render(frameInfo);
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
 
