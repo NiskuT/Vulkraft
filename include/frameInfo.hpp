@@ -28,7 +28,7 @@ namespace engine {
         int frameIndex;
         float frameTime;
         VkCommandBuffer commandBuffer;
-        camera& camera;
+        camera& myCamera;
         VkDescriptorSet globalDescriptorSet;
         gameObject::Map& gameObjects;
     };

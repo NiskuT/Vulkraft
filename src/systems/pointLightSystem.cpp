@@ -101,7 +101,7 @@ namespace engine
             if (gameObject.pointLight == nullptr) continue;
 
             // calculate distance to camera
-            auto offset = frameInfo.camera.getPosition() - gameObject.transform.translation;
+            auto offset = frameInfo.myCamera.getPosition() - gameObject.transform.translation;
             float disSquared = glm::dot(offset, offset);
             sorted[disSquared] = gameObject.getId();
         }
