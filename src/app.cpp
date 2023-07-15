@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <array>
+#include <iostream>
 
 #define MAX_FRAME_TIME 0.05f
 
@@ -24,8 +25,11 @@ namespace engine
         globalPool = engineDescriptorPool::Builder(device)
             .setMaxSets(swapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
         loadGameObjects();
+        loadTextures();
+
     }
 
     app::~app() {}
@@ -47,14 +51,18 @@ namespace engine
 
         auto globalSetLayout = engineDescriptorSetLayout::Builder(device)
             .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(swapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < globalDescriptorSets.size(); i++)
         {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            auto imageInfo = textures->getDescriptor();
+
             engineDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
+                .writeImage(1, imageInfo)
                 .build(globalDescriptorSets[i]);
         }
 
@@ -116,13 +124,13 @@ namespace engine
 
     void app::loadGameObjects()
     {
-        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\smooth_vase.obj");
+        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\cubeGrass.obj");
         auto gameObj = gameObject::createGameObject();
         gameObj.transform.translation.z = -2.5f;
         gameObj.model = gameObjModel;
 
-        gameObj.transform.translation = {0.5f, 0.5f, 0.0f};
-        gameObj.transform.scale = glm::vec3(3.0f, 1.5f, 3.0f);
+        gameObj.transform.translation = {0.5f, -0.5f, 0.f};
+        gameObj.transform.scale = glm::vec3(.1f, .1f, .1f);
 
         gameObjects.emplace(gameObj.getId(), std::move(gameObj));
 
@@ -139,7 +147,7 @@ namespace engine
             {.1f, 1.f, .1f},
             {1.f, 1.f, .1f},
             {.1f, 1.f, 1.f},
-            {1.f, 1.f, 1.f}  //
+            {1.f, 1.f, 1.f}
         };
 
         for (int i = 0; i < lightColors.size(); i++)
@@ -151,4 +159,12 @@ namespace engine
             gameObjects.emplace(pointLight.getId(), std::move(pointLight));
         }
     }
+
+    void app::loadTextures()
+    {
+        auto textureFilepath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\minecraftGrass.png";
+        textures = engineTexture::createTextureFromFile(device, textureFilepath);
+    }
+
+
 } // namespace engine
