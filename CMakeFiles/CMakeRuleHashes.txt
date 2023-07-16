@@ -1,0 +1,6 @@
+# Hashes of file build rules.
+5f5bee05c42c8d3750d91df509e435d0 CMakeFiles/Shaders
+30f9d4bb3754fc6d6c4da4e16805556b shaders/point_light.frag.spv
+66d1445e775ae4391f6f08f98cfb412f shaders/point_light.vert.spv
+fbb86e714565da09c5aff35010bb0c2b shaders/simple_shaders.frag.spv
+6183c0a759de2cf8eda1fd8a47bf288b shaders/simple_shaders.vert.spv

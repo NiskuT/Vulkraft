@@ -1,0 +1,4 @@
+/home/lyn/Documents/GitHub/Vulkraft/CMakeFiles/Vulkraft.dir
+/home/lyn/Documents/GitHub/Vulkraft/CMakeFiles/Shaders.dir
+/home/lyn/Documents/GitHub/Vulkraft/CMakeFiles/edit_cache.dir
+/home/lyn/Documents/GitHub/Vulkraft/CMakeFiles/rebuild_cache.dir

@@ -61,10 +61,9 @@ namespace engine
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         camera myCamera{};
-        myCamera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
-        auto viewerObject = gameObject::createGameObject();
-        keyboardController cameraController{};
+        auto &viewerObjectPlayer = gameObjects.at(0); // the viewer object = the player  : so we can move the player in the scene 
+        keyboardController controller{}; // for the player and the camera
 
         auto currentTime = std::chrono::high_resolution_clock::now();
         
@@ -78,9 +77,14 @@ namespace engine
 
             frameTime = std::min(frameTime, MAX_FRAME_TIME);
 
-            cameraController.moveInPlaneXZ(window.getGLFWwindow(), frameTime, viewerObject);
-            myCamera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
-
+            controller.moveInPlaneXZ(window.getGLFWwindow(), frameTime, viewerObjectPlayer); // to move the player 
+            glm::vec3 pos = controller.computePosCam(viewerObjectPlayer.transform, myCamera, frameTime, window.getGLFWwindow()); 
+            if(myCamera.getViewBool()) {
+                myCamera.setViewDirection(pos, glm::vec3( sin(viewerObjectPlayer.transform.rotation.y) *cos(myCamera.getAlpha()), 0.0f -sin(myCamera.getAlpha()) , cos(viewerObjectPlayer.transform.rotation.y)*cos(myCamera.getAlpha()))) ; 
+            } else {
+                myCamera.setViewTarget(pos, viewerObjectPlayer.transform.translation + glm::vec3(0.0f, -0.5f, 0.0f)); 
+            }
+            
             float aspect = engineRenderer.getAspectRatio();
             myCamera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 100.f);
@@ -116,23 +120,26 @@ namespace engine
 
     void app::loadGameObjects()
     {
-        std::shared_ptr<engineModel> gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\smooth_vase.obj");
-        auto gameObj = gameObject::createGameObject();
-        gameObj.transform.translation.z = -2.5f;
-        gameObj.model = gameObjModel;
+        //we create the first object of the scene : the player 
+        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, "models/smallSteve.obj");
+        auto Steve = gameObject::createGameObject();
+        Steve.model = SteveModel;
+        // first transformations on steve in order to place him in the scene 
+        Steve.transform.translation = {0.0f, 0.5f, 1.0f};
+        Steve.transform.rotation = {0,0,glm::radians(180.0f)}; 
+        Steve.transform.scale = glm::vec3(0.3f);
+        //place him in the scene
+        gameObjects.emplace(Steve.getId(), std::move(Steve));
 
-        gameObj.transform.translation = {0.5f, 0.5f, 0.0f};
-        gameObj.transform.scale = glm::vec3(3.0f, 1.5f, 3.0f);
-
-        gameObjects.emplace(gameObj.getId(), std::move(gameObj));
-
-        gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
+        //we create the second object of the scene : the floor (flat world for now)
+        std::shared_ptr<engineModel> FloorModel = engineModel::createModelFromFile(device, "models/quad.obj");
         auto floor = gameObject::createGameObject();
-        floor.model = gameObjModel;
+        floor.model = FloorModel;
         floor.transform.translation = {0.f, .5f, 0.f};
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
         gameObjects.emplace(floor.getId(), std::move(floor));
 
+        // other objects in the scene : the moving point lights 
         std::vector<glm::vec3> lightColors{
             {1.f, .1f, .1f},
             {.1f, .1f, 1.f},

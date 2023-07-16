@@ -15,11 +15,12 @@ namespace engine
     class app
     {
         public:
+            // window's size 
             static constexpr int WIDTH = 800;
             static constexpr int HEIGHT = 600;
 
-            app();
-            ~app();
+            app(); // constructor 
+            ~app(); // destructor 
 
             app(const app&) = delete;
             void operator=(const app&) = delete;
