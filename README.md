@@ -26,3 +26,7 @@ How to build this project:
 * If using Visual Studio 2019 run  `mkdir build && cmake -S . -B .\build\`
 
 * If you are using minGW 64 run `./mingwBuild.bat`. Then you can go to build and run `./Vulkraft`.
+
+## Short documentation
+
+[Link to the markdown](./Structure_of_project.md)
