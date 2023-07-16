@@ -5,6 +5,7 @@
 #include "gameObject.hpp"
 #include "renderer.hpp"
 #include "descriptors.hpp"
+#include "engineTexture.hpp"
 
 
 #include <memory>
@@ -29,6 +30,7 @@ namespace engine
 
         private:
             void loadGameObjects();
+            void loadTextures();
 
             gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
             engineDevice device{window};
@@ -36,6 +38,8 @@ namespace engine
 
             // Order of declaration is important here
             std::unique_ptr<engineDescriptorPool> globalPool{};
-            gameObject::Map gameObjects;          
+            gameObject::Map gameObjects;
+            std::unique_ptr<engineTexture> textures;      
+
     };
 }

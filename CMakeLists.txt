@@ -57,6 +57,7 @@ endif()
 include_directories(external)
 
 set(TINYOBJ_PATH 3rdParty/tinyobjloader)
+set(STB_PATH 3rdParty/stb)
 
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
@@ -84,6 +85,7 @@ if (WIN32)
     ${Vulkan_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS}
     ${TINYOBJ_PATH}
+    ${STB_PATH}
     ${GLM_PATH}
     )
 
@@ -98,6 +100,7 @@ elseif (UNIX)
     target_include_directories(${PROJECT_NAME} PUBLIC
       ${PROJECT_SOURCE_DIR}/src
       ${TINYOBJ_PATH}
+      ${STB_PATH}
     )
     target_link_libraries(${PROJECT_NAME} glfw ${Vulkan_LIBRARIES})
 endif()
