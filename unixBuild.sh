@@ -2,5 +2,5 @@
 mkdir -p build
 cd build
 cmake -S ../ -B .
-make && make shaders && ./LveEngine
+make && make Shaders 
 cd ..

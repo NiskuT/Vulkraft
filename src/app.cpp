@@ -169,7 +169,7 @@ namespace engine
 
     void app::loadTextures()
     {
-        auto textureFilepath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\minecraftGrass.png";
+        auto textureFilepath = "textures/minecraftGrass.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
     }
 
