@@ -14,6 +14,9 @@
 #define EAST_FACE 0b010000
 #define WEST_FACE 0b100000
 
+#define SIDE_TX 1
+#define TOP_TX 2
+
 #define TOP_FACE_VISIBLE(blockFacesVisible) ((blockFacesVisible) & TOP_FACE)
 #define BOTTOM_FACE_VISIBLE(blockFacesVisible) ((blockFacesVisible) & BOTTOM_FACE)
 #define NORTH_FACE_VISIBLE(blockFacesVisible) ((blockFacesVisible) & NORTH_FACE)
@@ -32,9 +35,14 @@ namespace engine
         GRASS,
         STONE,
         WOOD,
-        LEAVES,
         WATER,
-        SAND
+        SAND,
+        PLANK,
+        GLOWSTONE,
+        COBBLESTONE,
+        BEDROCK,
+        LEAVES,
+        NUMBER_OF_BLOCKS
     };
 
     class block
