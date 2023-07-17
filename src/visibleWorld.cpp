@@ -5,48 +5,76 @@
 
 namespace engine
 {
-    void visibleWorld::getWorldMesh(std::vector<block::Vertex>& vertices, std::vector<uint32_t>& indices, int playerX, int playerY, int renderDistance)
+
+    visibleWorld::visibleWorld(int playerX, int playerY)
     {
         int chunkX = playerX / CHUNK_SIZE;
         int chunkY = playerY / CHUNK_SIZE;
+    }    
+    
+    void visibleWorld::updateWorldMesh(int playerX, int playerY, int renderDistance)
+    {
+        int newChunkX = playerX / CHUNK_SIZE;
+        int newChunkY = playerY / CHUNK_SIZE;
 
-        std::unordered_map<block::Vertex, uint32_t> uniqueVertices{};
-        std::vector<std::pair<int, int>> newChunks;
+        if (newChunkX != chunkX || newChunkY != chunkY)
+        {
+            chunkX = newChunkX;
+            chunkY = newChunkY;
+            for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
+            {
+                for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
+                {
+                    auto key = std::make_pair(x, y);
+                    if (map.find(key) == map.end())
+                    {
+                        map.emplace(key, std::make_shared<chunk>(x, y));
+                    }
+                }
+            }           
+        }
 
+        std::vector<std::pair<int, int>> chunkInUse;
         for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
         {
             for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
             {
                 auto key = std::make_pair(x, y);
-                if (map.find(key) == map.end())
+                if (map[key]->doesChunkNeedUpdate()) 
                 {
-                    map.emplace(key, std::make_shared<chunk>(x, y));
-                    newChunks.push_back(key);
+                    auto neighbor = getNeighbor(key);
+                    map[key]->updateBlockFacesVisible(neighbor); 
+                }
+                if (!map[key]->isChunkLoaded())
+                {
+                    map[key]->updateChunkMesh();
+                    chunkInUse.push_back(key);
                 }
             }
         }
+        clearUnuseChunk(chunkInUse);
 
-        for (auto& key : newChunks)
+    }
+
+    std::vector<std::shared_ptr<chunk>> visibleWorld::getNeighbor(const std::pair<int, int> key)
+    {
+        std::vector<std::shared_ptr<chunk>> neighbor = {map[key]};
+
+        if (map.find( std::make_pair(key.first+1, key.second)) != map.end()) neighbor.push_back(map[std::make_pair(key.first+1, key.second)]);
+        if (map.find( std::make_pair(key.first-1, key.second)) != map.end()) neighbor.push_back(map[std::make_pair(key.first-1, key.second)]);
+        if (map.find( std::make_pair(key.first, key.second+1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second+1)]);
+        if (map.find( std::make_pair(key.first, key.second-1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second-1)]);
+    }
+
+    void visibleWorld::clearUnuseChunk(std::vector<std::pair<int, int>> chunkInUse)
+    {
+        for (auto& chunk : chunkLoaded)
         {
-            std::vector<std::shared_ptr<chunk>> neighbor = {map[key]};
-
-            if (map.find( std::make_pair(key.first+1, key.second)) != map.end()) neighbor.push_back(map[std::make_pair(key.first+1, key.second)]);
-            if (map.find( std::make_pair(key.first-1, key.second)) != map.end()) neighbor.push_back(map[std::make_pair(key.first-1, key.second)]);
-            if (map.find( std::make_pair(key.first, key.second+1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second+1)]);
-            if (map.find( std::make_pair(key.first, key.second-1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second-1)]);
-
-            map[key]->updateBlockFacesVisible(neighbor);
-        }
-
-        for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
-        {
-            for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
+            if (std::find(chunkInUse.begin(), chunkInUse.end(), chunk) == chunkInUse.end())
             {
-                auto key = std::make_pair(x, y);
-                map[key]->getChunkMesh(uniqueVertices, vertices, indices);
+                map[chunk]->unloadChunkFromDevice();
+                chunkLoaded.erase(std::remove(chunkLoaded.begin(), chunkLoaded.end(), chunk), chunkLoaded.end());
             }
         }
-
-
     }
 } // namespace engine
