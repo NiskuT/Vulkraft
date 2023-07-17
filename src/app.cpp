@@ -70,7 +70,7 @@ namespace engine
         pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         camera myCamera{};
 
-        auto &viewerObjectPlayer = gameObjects.at(1); // the viewer object = the player  : so we can move the player in the scene 
+        auto &viewerObjectPlayer = gameObjects.at(0); // the viewer object = the player  : so we can move the player in the scene 
         keyboardController controller{}; // for the player and the camera
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -140,12 +140,20 @@ namespace engine
         gameObjects.emplace(Steve.getId(), std::move(Steve));
 
         // a block 
-        std::shared_ptr<engineModel> CubeModel = engineModel::createModelFromFile(device, "models/cubeGrass.obj");
+        std::shared_ptr<engineModel> CubeModel = engineModel::createModelFromFile(device, "models/blocTest.obj");
         auto cube = gameObject::createGameObject();
         cube.model = CubeModel;
         cube.transform.translation = {0.f, -0.1f, 1.7f};
         cube.transform.scale = glm::vec3(0.1f);
         gameObjects.emplace(cube.getId(), std::move(cube));
+
+        // the cubeBox 
+        /*std::shared_ptr<engineModel> CubeBoxModel = engineModel::createModelFromFile(device, "models/cubebox.obj");
+        auto cubeBox = gameObject::createGameObject();
+        cubeBox.model = CubeBoxModel;
+        cubeBox.transform.translation = {0.f, 0.f, 0.f};
+        cubeBox.transform.scale = glm::vec3(0.3f);
+        gameObjects.emplace(cubeBox.getId(), std::move(cubeBox));*/
 
         //we create the second object of the scene : the floor (flat world for now)
         std::shared_ptr<engineModel> FloorModel = engineModel::createModelFromFile(device, "models/quad.obj");
@@ -164,6 +172,7 @@ namespace engine
             {.1f, 1.f, 1.f},
             {1.f, 1.f, 1.f}
         };
+
 
         auto sun = gameObject::makePointLight(2.0f);
         sun.color = {1.0f, 1.0f, 1.f}; // yellowish 1 1 0.5
@@ -189,7 +198,7 @@ namespace engine
 
     void app::loadTextures()
     {
-        auto textureFilepath = "textures/TextureSteve.png";
+        auto textureFilepath = "textures/textures.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
     }
 
