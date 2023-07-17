@@ -70,7 +70,7 @@ namespace engine
         pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         camera myCamera{};
 
-        auto &viewerObjectPlayer = gameObjects.at(0); // the viewer object = the player  : so we can move the player in the scene 
+        auto &viewerObjectPlayer = gameObjects.at(1); // the viewer object = the player  : so we can move the player in the scene 
         keyboardController controller{}; // for the player and the camera
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -129,7 +129,7 @@ namespace engine
     void app::loadGameObjects()
     {
         //we create the first object of the scene : the player 
-        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, "models/smallSteve.obj");
+        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, "models/smallSteveWithTexture.obj");
         auto Steve = gameObject::createGameObject();
         Steve.model = SteveModel;
         // first transformations on steve in order to place him in the scene 
@@ -138,6 +138,14 @@ namespace engine
         Steve.transform.scale = glm::vec3(0.3f);
         //place him in the scene
         gameObjects.emplace(Steve.getId(), std::move(Steve));
+
+        // a block 
+        std::shared_ptr<engineModel> CubeModel = engineModel::createModelFromFile(device, "models/cubeGrass.obj");
+        auto cube = gameObject::createGameObject();
+        cube.model = CubeModel;
+        cube.transform.translation = {0.f, -0.1f, 1.7f};
+        cube.transform.scale = glm::vec3(0.1f);
+        gameObjects.emplace(cube.getId(), std::move(cube));
 
         //we create the second object of the scene : the floor (flat world for now)
         std::shared_ptr<engineModel> FloorModel = engineModel::createModelFromFile(device, "models/quad.obj");
@@ -157,19 +165,31 @@ namespace engine
             {1.f, 1.f, 1.f}
         };
 
-        for (int i = 0; i < lightColors.size(); i++)
+        auto sun = gameObject::makePointLight(2.0f);
+        sun.color = {1.0f, 1.0f, 1.f}; // yellowish 1 1 0.5
+        //auto rotateSun = glm::rotate(glm::mat4(1.f), glm::radians(0.0f), glm::vec3(0.f, 0.f, 1.f));
+        sun.transform.translation = glm::vec3(0.f, 0.0f, 3.0f);
+        gameObjects.emplace(sun.getId(), std::move(sun));
+
+        auto moon = gameObject::makePointLight(2.0f);
+        moon.color = {1.0f, 1.0f, 1.0f}; // blueish 0.7 0.7 1
+        //auto rotateMoon = glm::rotate(glm::mat4(1.f), glm::radians(270.0f), glm::vec3(0.f, 0.f, 1.f));
+        moon.transform.translation = glm::vec3(0.f, 0.0f, -3.0f); // opposite positions of start for sun and moon
+        gameObjects.emplace(moon.getId(), std::move(moon));
+
+        /*for (int i = 0; i < lightColors.size(); i++)
         {
-            auto pointLight = gameObject::makePointLight(0.2f);
+            auto pointLight = gameObject::makePointLight(0.5f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(glm::mat4(1.f), (i*glm::two_pi<float>()) / lightColors.size(), glm::vec3(0.f, -1.f, 0.f));
             pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
             gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-        }
+        }*/
     }
 
     void app::loadTextures()
     {
-        auto textureFilepath = "textures/minecraftGrass.png";
+        auto textureFilepath = "textures/TextureSteve.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
     }
 
