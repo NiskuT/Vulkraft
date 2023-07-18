@@ -10,10 +10,9 @@
 #include <stdexcept>
 #include <array>
 
-/* TODO
-    - Creer une variable needToUpdateBuffer pour chaque fois que je joueur change de chunk ou bien qu'un block et cassé ou posé
-    - Gerer les deplacement du joueur
-*/
+#ifndef SHADER_PATH
+  #define SHADER_PATH "shaders/"
+#endif
 
 namespace engine 
 {
@@ -73,7 +72,7 @@ namespace engine
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        p_pipeline = std::make_unique<pipeline>(device, "shaders/block_shaders.vert.spv", "shaders/block_shaders.frag.spv", pipelineConfig);
+        p_pipeline = std::make_unique<pipeline>(device, SHADER_PATH "block_shaders.vert.spv", SHADER_PATH "block_shaders.frag.spv", pipelineConfig);
     }
 
 
