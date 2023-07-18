@@ -2,6 +2,7 @@
 
 #include "systems/renderSystem.hpp"
 #include "systems/pointLightSystem.hpp"
+#include "systems/renderWorld.hpp"
 #include "camera.hpp"
 #include "keyboardController.hpp"
 #include "vulkanBuffer.hpp"
@@ -14,7 +15,6 @@
 #include <stdexcept>
 #include <chrono>
 #include <array>
-#include <iostream>
 
 #define MAX_FRAME_TIME 0.05f
 
@@ -27,8 +27,16 @@ namespace engine
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
+
+        blockPool = engineDescriptorPool::Builder(device)
+            .setMaxSets(swapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
+
         loadGameObjects();
         loadTextures();
+        myWorld = std::make_shared<visibleWorld>(device);
 
     }
 
@@ -55,19 +63,28 @@ namespace engine
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(swapChain::MAX_FRAMES_IN_FLIGHT);
+        std::vector<VkDescriptorSet> blockDescriptorSet(swapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < globalDescriptorSets.size(); i++)
         {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
             auto imageInfo = textures->getDescriptor();
+            auto imageBlockInfo = blockTexture->getDescriptor();
 
             engineDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
                 .writeImage(1, imageInfo)
                 .build(globalDescriptorSets[i]);
+
+            engineDescriptorWriter(*globalSetLayout, *blockPool)
+                .writeBuffer(0, &bufferInfo)
+                .writeImage(1, imageBlockInfo)
+                .build(blockDescriptorSet[i]);
         }
 
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        renderWorld worldRenderer{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+
         camera myCamera{};
 
         auto &viewerObjectPlayer = gameObjects.at(0); // the viewer object = the player  : so we can move the player in the scene 
@@ -94,13 +111,15 @@ namespace engine
             }
             
             float aspect = engineRenderer.getAspectRatio();
+
             myCamera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 100.f);
 
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
                 int frameIndex = engineRenderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex], gameObjects};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex], gameObjects, *myWorld};
+                FrameInfo frameInfoBlocks{frameIndex, frameTime, commandBuffer, myCamera, blockDescriptorSet[frameIndex], gameObjects, *myWorld};
 
                 // update
                 GlobalUbo ubo{};
@@ -108,6 +127,8 @@ namespace engine
                 ubo.view = myCamera.getViewMatrix();
                 ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
+                auto position = myCamera.getPosition();
+                myWorld->updateWorldMesh(static_cast<int>(position.x * 10), static_cast<int>(position.z * 10), 3); // x, z, render distance
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -117,7 +138,7 @@ namespace engine
                 // order matters
                 renderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
-
+                worldRenderer.renderVisibleWorld(frameInfoBlocks);
                 
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
@@ -139,13 +160,12 @@ namespace engine
         //place him in the scene
         gameObjects.emplace(Steve.getId(), std::move(Steve));
 
-        //we create the second object of the scene : the floor (flat world for now)
-        std::shared_ptr<engineModel> FloorModel = engineModel::createModelFromFile(device, "models/quad.obj");
+        /*gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
         auto floor = gameObject::createGameObject();
         floor.model = FloorModel;
         floor.transform.translation = {0.f, .5f, 0.f};
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
-        gameObjects.emplace(floor.getId(), std::move(floor));
+        gameObjects.emplace(floor.getId(), std::move(floor));*/
 
         // other objects in the scene : the moving point lights 
         std::vector<glm::vec3> lightColors{
@@ -171,6 +191,9 @@ namespace engine
     {
         auto textureFilepath = "textures/minecraftGrass.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
+
+        auto texturePath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\blockTextureAlpha.png";
+        blockTexture = engineTexture::createTextureFromFile(device, texturePath);
     }
 
 

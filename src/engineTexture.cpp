@@ -101,8 +101,8 @@ namespace engine
         // Parameters for the sampler
         VkSamplerCreateInfo samplerInfo{};
         samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;  // interpolate texels that are magnified on the screen
-        samplerInfo.minFilter = VK_FILTER_LINEAR;  // interpolate texels that are minified on the screen
+        samplerInfo.magFilter = VK_FILTER_NEAREST;  // interpolate texels that are magnified on the screen
+        samplerInfo.minFilter = VK_FILTER_NEAREST;  // interpolate texels that are minified on the screen
         samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;  // How to handle texture coordinates outside of the [0, 1] range in the U direction
         samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
