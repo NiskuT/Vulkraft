@@ -123,7 +123,7 @@ namespace engine
                 ubo.view = myCamera.getViewMatrix();
                 ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
-                myWorld->updateWorldMesh(0, 0, 1);
+                myWorld->updateWorldMesh(0, 0, 1); // x, z, render distance
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 

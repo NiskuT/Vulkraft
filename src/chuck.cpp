@@ -7,16 +7,16 @@
 
 namespace engine
 {
-    chunk::chunk(engineDevice& device, int x, int y) : device{device}, x(x), y(y)
+    chunk::chunk(engineDevice& device, int x, int z) : device{device}, x(x), z(z)
     {
         transform.scale = glm::vec3(.1f, .1f, .1f);
-        for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
         {
-            for (int j = 0; j < CHUNK_SIZE; j++)
+            for (int i = 0; i < CHUNK_SIZE; i++)
             {
                 for (int k = 0; k < CHUNK_SIZE; k++)
                 {
-                    addBlock(x * CHUNK_SIZE + j, y * CHUNK_SIZE + k, i, BlockType::GRASS);
+                    addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::GRASS);
                 }
             }
         }
@@ -26,19 +26,14 @@ namespace engine
             for (int j = 0; j < CHUNK_SIZE; j++)
             {
                 // 30 % chance of adding a block
-                addBlock(x * CHUNK_SIZE + i, y * CHUNK_SIZE + j, 4, BlockType::DIRT);
-
-            }
-        }
-        for (int i = 0; i < CHUNK_SIZE; i++)
-        {
-            for (int j = 0; j < CHUNK_SIZE; j++)
-            {
-                // 30 % chance of adding a block
-                addBlock(x * CHUNK_SIZE + i, y * CHUNK_SIZE + j, 5, BlockType::SAND);
+                addBlock(x * CHUNK_SIZE + i, z * CHUNK_SIZE + j, 4, BlockType::DIRT);
 
             }
         }*/
+        for (int i = 0; i < CHUNK_SIZE/2; i++)
+        {
+            addBlock(x * CHUNK_SIZE, 0, z * CHUNK_SIZE+i, BlockType::SAND);
+        }
         
     }
 

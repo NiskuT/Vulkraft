@@ -8,23 +8,23 @@
 namespace engine
 {
 
-    visibleWorld::visibleWorld(engineDevice& device, int playerX, int playerY) : device{device}
+    visibleWorld::visibleWorld(engineDevice& device, int playerX, int playerZ) : device{device}
     {
-        int chunkX = playerX / CHUNK_SIZE;
-        int chunkY = playerY / CHUNK_SIZE;
+        chunkX = playerX / CHUNK_SIZE;
+        chunkZ = playerZ / CHUNK_SIZE;
     }    
     
-    void visibleWorld::updateWorldMesh(int playerX, int playerY, int renderDistance)
+    void visibleWorld::updateWorldMesh(int playerX, int playerZ, int renderDistance)
     {
         int newChunkX = playerX / CHUNK_SIZE;
-        int newChunkY = playerY / CHUNK_SIZE;
-        if (newChunkX != chunkX || newChunkY != chunkY || map.empty())
+        int newChunkZ = playerZ / CHUNK_SIZE;
+        if (newChunkX != chunkX || newChunkZ != chunkZ || map.empty())
         {
             chunkX = newChunkX;
-            chunkY = newChunkY;
+            chunkZ = newChunkZ;
             for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
             {
-                for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
+                for (int y = chunkZ - renderDistance; y <= chunkZ + renderDistance; y++)
                 {
                     auto key = std::make_pair(x, y);
                     if (map.find(key) == map.end())
@@ -39,7 +39,7 @@ namespace engine
         chunkToRender.clear();
         for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
         {
-            for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
+            for (int y = chunkZ - renderDistance; y <= chunkZ + renderDistance; y++)
             {
                 auto key = std::make_pair(x, y);
                 if (map.find(key) == map.end())

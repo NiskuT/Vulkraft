@@ -42,7 +42,7 @@ namespace engine
         std::vector<std::pair<int, int>> chunkLoaded;
         std::vector<std::shared_ptr<chunk>> chunkToRender;
 
-        int chunkX, chunkY;
+        int chunkX, chunkZ;
         engineDevice& device;
 
         void clearUnuseChunk(std::vector<std::pair<int, int>> chunkInUse);

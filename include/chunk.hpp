@@ -17,14 +17,14 @@ namespace engine
     class chunk
     {
         public:
-            chunk(engineDevice& device, int x, int y);
+            chunk(engineDevice& device, int x, int z);
             ~chunk() = default;
 
             void addBlock(int worldX, int worldY, int worldZ, BlockType blockType);
             void updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>>& chunks);
             bool isThereABlockAt(int worldX, int worldY, int worldZ);
 
-            void getPosition(int& x, int& y) { x = this->x; y = this->y; };
+            void getPosition(int& x, int& z) { x = this->x; z = this->z; };
 
             void bind(VkCommandBuffer commandBuffer);
             void draw(VkCommandBuffer commandBuffer);
@@ -44,7 +44,7 @@ namespace engine
 
         private:
             unsigned long int hashFunction(int x, int y, int z);
-            int x, y;
+            int x, z;
             std::unordered_map<unsigned long int, block> blocks;
 
             engineDevice& device;
