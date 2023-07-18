@@ -9,6 +9,7 @@ namespace engine
 {
     chunk::chunk(engineDevice& device, int x, int y) : device{device}, x(x), y(y)
     {
+        transform.scale = glm::vec3(.1f, .1f, .1f);
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < CHUNK_SIZE; j++)
@@ -20,16 +21,24 @@ namespace engine
             }
         }
 
+        /*for (int i = 0; i < CHUNK_SIZE; i++)
+        {
+            for (int j = 0; j < CHUNK_SIZE; j++)
+            {
+                // 30 % chance of adding a block
+                addBlock(x * CHUNK_SIZE + i, y * CHUNK_SIZE + j, 4, BlockType::DIRT);
+
+            }
+        }
         for (int i = 0; i < CHUNK_SIZE; i++)
         {
             for (int j = 0; j < CHUNK_SIZE; j++)
             {
                 // 30 % chance of adding a block
-                if (rand() % 100 < 30)
-                    addBlock(x * CHUNK_SIZE + i, y * CHUNK_SIZE + j, 4, BlockType::GRASS);
+                addBlock(x * CHUNK_SIZE + i, y * CHUNK_SIZE + j, 5, BlockType::SAND);
 
             }
-        }
+        }*/
         
     }
 

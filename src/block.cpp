@@ -17,74 +17,77 @@ namespace engine
         worldX = static_cast<float>(pos[0]);
         worldY = static_cast<float>(pos[1]);
         worldZ = static_cast<float>(pos[2]);
-        constexpr float txUnit = 1.f / static_cast<float>(BlockType::NUMBER_OF_BLOCKS);
-        float textureY = static_cast<float>(blockType) * txUnit;
+        
+        constexpr float txUnitX = 1.f / 3.0f;
+        constexpr float txUnitY = 1.f / static_cast<float>(BlockType::NUMBER_OF_BLOCKS);
+
+        float textureY = static_cast<float>(blockType) * txUnitY;
 
         if (TOP_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{0.f, 0.f, 1.f};
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {TOP_TX * txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {TOP_TX * txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {TOP_TX * txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {TOP_TX * txUnitX, textureY + txUnitY}});
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {1.0f, textureY}});
 
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {1.0f, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {TOP_TX * txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {1.0f, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {TOP_TX * txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {1.0f, textureY + txUnitY}});
         }
         if (BOTTOM_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{0.f, 0.f, -1.f};
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ - 1.f}, norm, {0.0f, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {0.0f, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {txUnit, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {0.0f, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {txUnitX, textureY}});
 
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {0.0f, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {0.0f, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {txUnitX, textureY + txUnitY}});
         }
         if (NORTH_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{0.f, 1.f, 0.f};
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit + txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX + txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
 
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnit, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnitX, textureY}});
         }
         if (SOUTH_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{0.f, -1.f, 0.f};
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnit + txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnitX + txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
 
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnit, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnitX, textureY}});
         }
         if (EAST_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{1.f, 0.f, 0.f};
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnit + txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnitX + txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
 
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnit, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnitX, textureY}});
         }
         if (WEST_FACE_VISIBLE(blockFacesVisible))
         {
             auto norm = glm::vec3{-1.f, 0.f, 0.f};
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnit + txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ - 1.f}, norm, {SIDE_TX * txUnitX + txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
 
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnit + txUnit, textureY}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnit, textureY + txUnit}});
-            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnit, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {SIDE_TX * txUnitX + txUnitX, textureY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ - 1.f}, norm, {SIDE_TX * txUnitX, textureY + txUnitY}});
+            pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {SIDE_TX * txUnitX, textureY}});
 
         }
     }
@@ -107,7 +110,7 @@ namespace engine
     {
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
         bindingDescriptions[0].binding = 0; 
-        bindingDescriptions[0].stride = sizeof(Vertex);
+        bindingDescriptions[0].stride = sizeof(block::Vertex);
         bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
         return bindingDescriptions;
@@ -117,9 +120,9 @@ namespace engine
     {
         std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 
-        attributeDescriptions.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position)});
-        attributeDescriptions.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal)});
-        attributeDescriptions.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)});
+        attributeDescriptions.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(block::Vertex, position)});
+        attributeDescriptions.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(block::Vertex, normal)});
+        attributeDescriptions.push_back({2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(block::Vertex, uv)});
 
         return attributeDescriptions;
     }

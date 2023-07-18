@@ -76,6 +76,7 @@ namespace engine
         p_pipeline = std::make_unique<pipeline>(device, "shaders/block_shaders.vert.spv", "shaders/block_shaders.frag.spv", pipelineConfig);
     }
 
+
     void renderWorld::renderVisibleWorld(FrameInfo& frameInfo)
     {
         p_pipeline->bind(frameInfo.commandBuffer);
@@ -93,16 +94,12 @@ namespace engine
             0,
             nullptr);
 
-        for (auto& kv : frameInfo.gameObjects)
+        auto chunkToRender = frameInfo.myWorld.getChunkToRender();
+        for (auto& currChunk : chunkToRender)
         {
-            auto& obj = kv.second;
-            if (obj.model == nullptr)
-            {
-                continue;
-            }
             SimplePushConstantData push{};
-            push.modelMatrix = obj.transform.mat4();
-            push.normalMatrix = obj.transform.normalMatrix();
+            push.modelMatrix = currChunk->transform.mat4();
+            push.normalMatrix = currChunk->transform.normalMatrix();
 
             vkCmdPushConstants(
                 frameInfo.commandBuffer,
@@ -111,8 +108,8 @@ namespace engine
                 0,
                 sizeof(SimplePushConstantData),
                 &push);
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+            currChunk->bind(frameInfo.commandBuffer);
+            currChunk->draw(frameInfo.commandBuffer);
         }
     }
 

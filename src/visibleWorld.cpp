@@ -3,10 +3,12 @@
 #include "block.hpp"
 #include "utils.hpp"
 
+#include <iostream>
+
 namespace engine
 {
 
-    visibleWorld::visibleWorld(int playerX, int playerY)
+    visibleWorld::visibleWorld(engineDevice& device, int playerX, int playerY) : device{device}
     {
         int chunkX = playerX / CHUNK_SIZE;
         int chunkY = playerY / CHUNK_SIZE;
@@ -16,8 +18,7 @@ namespace engine
     {
         int newChunkX = playerX / CHUNK_SIZE;
         int newChunkY = playerY / CHUNK_SIZE;
-
-        if (newChunkX != chunkX || newChunkY != chunkY)
+        if (newChunkX != chunkX || newChunkY != chunkY || map.empty())
         {
             chunkX = newChunkX;
             chunkY = newChunkY;
@@ -28,28 +29,38 @@ namespace engine
                     auto key = std::make_pair(x, y);
                     if (map.find(key) == map.end())
                     {
-                        map.emplace(key, std::make_shared<chunk>(x, y));
+                        map.emplace(key, std::make_shared<chunk>(device, x, y));
                     }
                 }
             }           
         }
 
         std::vector<std::pair<int, int>> chunkInUse;
+        chunkToRender.clear();
         for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
         {
             for (int y = chunkY - renderDistance; y <= chunkY + renderDistance; y++)
             {
                 auto key = std::make_pair(x, y);
+                if (map.find(key) == map.end())
+                {
+                    std::cout << "ERROR: chunk not found" << std::endl;
+                }
                 if (map[key]->doesChunkNeedUpdate()) 
                 {
                     auto neighbor = getNeighbor(key);
                     map[key]->updateBlockFacesVisible(neighbor); 
                 }
+
+
+
+
                 if (!map[key]->isChunkLoaded())
                 {
                     map[key]->updateChunkMesh();
-                    chunkInUse.push_back(key);
                 }
+                chunkInUse.push_back(key);
+                chunkToRender.push_back(map[key]);
             }
         }
         clearUnuseChunk(chunkInUse);
@@ -64,6 +75,8 @@ namespace engine
         if (map.find( std::make_pair(key.first-1, key.second)) != map.end()) neighbor.push_back(map[std::make_pair(key.first-1, key.second)]);
         if (map.find( std::make_pair(key.first, key.second+1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second+1)]);
         if (map.find( std::make_pair(key.first, key.second-1)) != map.end()) neighbor.push_back(map[std::make_pair(key.first, key.second-1)]);
+
+        return neighbor;
     }
 
     void visibleWorld::clearUnuseChunk(std::vector<std::pair<int, int>> chunkInUse)

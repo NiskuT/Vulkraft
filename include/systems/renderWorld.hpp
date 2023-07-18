@@ -29,6 +29,7 @@ namespace engine
 
             engineDevice& device;
             std::unique_ptr<pipeline> p_pipeline;
-            VkPipelineLayout pipelineLayout;      
+            VkPipelineLayout pipelineLayout;    
+            std::shared_ptr<engineModel> gameObjModel;  
     };
 }

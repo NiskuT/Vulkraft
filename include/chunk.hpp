@@ -4,6 +4,7 @@
 
 #include "engineDevice.hpp"
 #include "vulkanBuffer.hpp"
+#include "gameObject.hpp"
 
 #include <unordered_map>
 #include <vector>
@@ -34,6 +35,13 @@ namespace engine
             bool doesChunkNeedUpdate() { return chunkNeedsUpdate; };
             bool isChunkLoaded() { return chunkIsLoaded; };
 
+            TransformComponent transform{};
+
+            void getChunkMesh(
+                std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
+                std::vector<block::Vertex>& vertices, 
+                std::vector<uint32_t>& indices);
+
         private:
             unsigned long int hashFunction(int x, int y, int z);
             int x, y;
@@ -50,11 +58,6 @@ namespace engine
 
             void updateVertexBuffers(const std::vector<block::Vertex>& vertices);
             void updateIndexBuffers(const std::vector<uint32_t>& indices);
-
-            void getChunkMesh(
-                std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
-                std::vector<block::Vertex>& vertices, 
-                std::vector<uint32_t>& indices);
 
     };
 }

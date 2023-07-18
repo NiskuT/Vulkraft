@@ -2,6 +2,7 @@
 
 #include "systems/renderSystem.hpp"
 #include "systems/pointLightSystem.hpp"
+#include "systems/renderWorld.hpp"
 #include "camera.hpp"
 #include "keyboardController.hpp"
 #include "vulkanBuffer.hpp"
@@ -14,7 +15,6 @@
 #include <stdexcept>
 #include <chrono>
 #include <array>
-#include <iostream>
 
 #define MAX_FRAME_TIME 0.05f
 
@@ -27,8 +27,16 @@ namespace engine
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
+
+        blockPool = engineDescriptorPool::Builder(device)
+            .setMaxSets(swapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, swapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
+
         loadGameObjects();
         loadTextures();
+        myWorld = std::make_shared<visibleWorld>(device);
 
     }
 
@@ -55,19 +63,28 @@ namespace engine
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(swapChain::MAX_FRAMES_IN_FLIGHT);
+        std::vector<VkDescriptorSet> blockDescriptorSet(swapChain::MAX_FRAMES_IN_FLIGHT);
         for (int i = 0; i < globalDescriptorSets.size(); i++)
         {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
             auto imageInfo = textures->getDescriptor();
+            auto imageBlockInfo = blockTexture->getDescriptor();
 
             engineDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
                 .writeImage(1, imageInfo)
                 .build(globalDescriptorSets[i]);
+
+            engineDescriptorWriter(*globalSetLayout, *blockPool)
+                .writeBuffer(0, &bufferInfo)
+                .writeImage(1, imageBlockInfo)
+                .build(blockDescriptorSet[i]);
         }
 
         renderSystem renderSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+        renderWorld worldRenderer{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
         pointLightSystem pointLightSystem{device, engineRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
+
         camera myCamera{};
         myCamera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
@@ -90,13 +107,15 @@ namespace engine
             myCamera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = engineRenderer.getAspectRatio();
+
             myCamera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             myCamera.setPerspectiveProjection(glm::radians(45.f), aspect, 0.1f, 100.f);
 
             if (auto commandBuffer = engineRenderer.beginFrame())
             {
                 int frameIndex = engineRenderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex], gameObjects};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, myCamera, globalDescriptorSets[frameIndex], gameObjects, *myWorld};
+                FrameInfo frameInfoBlocks{frameIndex, frameTime, commandBuffer, myCamera, blockDescriptorSet[frameIndex], gameObjects, *myWorld};
 
                 // update
                 GlobalUbo ubo{};
@@ -104,6 +123,7 @@ namespace engine
                 ubo.view = myCamera.getViewMatrix();
                 ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
+                myWorld->updateWorldMesh(0, 0, 1);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -113,7 +133,7 @@ namespace engine
                 // order matters
                 renderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
-
+                worldRenderer.renderVisibleWorld(frameInfoBlocks);
                 
                 engineRenderer.endSwapChainRenderPass(commandBuffer);
                 engineRenderer.endFrame();
@@ -129,17 +149,18 @@ namespace engine
         gameObj.transform.translation.z = -2.5f;
         gameObj.model = gameObjModel;
 
-        gameObj.transform.translation = {0.5f, -0.5f, 0.f};
+        gameObj.transform.translation = {0.5f, -0.5f, -3.f};
         gameObj.transform.scale = glm::vec3(.1f, .1f, .1f);
 
         gameObjects.emplace(gameObj.getId(), std::move(gameObj));
 
-        gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
+        /*gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
         auto floor = gameObject::createGameObject();
         floor.model = gameObjModel;
         floor.transform.translation = {0.f, .5f, 0.f};
-        floor.transform.scale = {3.0f, 1.0f, 3.0f};
-        gameObjects.emplace(floor.getId(), std::move(floor));
+        floor.transform.scale = {3.0f, 1.0f, 1.0f};
+        gameObjects.emplace(floor.getId(), std::move(floor));*/
+        
 
         std::vector<glm::vec3> lightColors{
             {1.f, .1f, .1f},
@@ -164,6 +185,9 @@ namespace engine
     {
         auto textureFilepath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\minecraftGrass.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
+
+        auto texturePath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\blockTextureAlpha.png";
+        blockTexture = engineTexture::createTextureFromFile(device, texturePath);
     }
 
 

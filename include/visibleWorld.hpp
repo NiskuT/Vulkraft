@@ -2,6 +2,8 @@
 
 #include "chunk.hpp"
 
+#include "engineDevice.hpp"
+
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -25,20 +27,23 @@ namespace engine
     class visibleWorld
     {
     public:
-        visibleWorld(int playerX = 0, int playerY = 0);
-        ~visibleWorld();
+        visibleWorld(engineDevice& device, int playerX = 0, int playerY = 0);
+        ~visibleWorld() = default;
 
         visibleWorld(const visibleWorld&) = delete;
         void operator=(const visibleWorld&) = delete;
 
         void updateWorldMesh(int playerX, int playerY, int renderDistance = 3);
         std::vector<std::shared_ptr<chunk>> getNeighbor(const std::pair<int, int> key);
+        std::vector<std::shared_ptr<chunk>> getChunkToRender() { return chunkToRender; }
 
     private:
         std::unordered_map<std::pair<int, int>, std::shared_ptr<chunk>> map;
         std::vector<std::pair<int, int>> chunkLoaded;
+        std::vector<std::shared_ptr<chunk>> chunkToRender;
 
         int chunkX, chunkY;
+        engineDevice& device;
 
         void clearUnuseChunk(std::vector<std::pair<int, int>> chunkInUse);
 

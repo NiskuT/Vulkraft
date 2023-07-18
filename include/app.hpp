@@ -6,6 +6,7 @@
 #include "renderer.hpp"
 #include "descriptors.hpp"
 #include "engineTexture.hpp"
+#include "visibleWorld.hpp"
 
 
 #include <memory>
@@ -35,10 +36,14 @@ namespace engine
             engineDevice device{window};
             renderer engineRenderer{window, device};
 
+            std::shared_ptr<visibleWorld> myWorld;
+
             // Order of declaration is important here
             std::unique_ptr<engineDescriptorPool> globalPool{};
+            std::unique_ptr<engineDescriptorPool> blockPool{};
             gameObject::Map gameObjects;
-            std::unique_ptr<engineTexture> textures;      
+            std::unique_ptr<engineTexture> textures;
+            std::unique_ptr<engineTexture> blockTexture;      
 
     };
 }
