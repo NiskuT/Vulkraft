@@ -2,6 +2,7 @@
 
 #include "gameWindow.hpp"
 #include "gameObject.hpp"
+#include "camera.hpp"
 
 
 namespace engine
@@ -21,9 +22,11 @@ namespace engine
             int lookRight = GLFW_KEY_RIGHT;
             int lookUp = GLFW_KEY_UP;
             int lookDown = GLFW_KEY_DOWN;
+            int changeView = GLFW_KEY_F5 ;
         };
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, gameObject& object);
+        glm::vec3 computePosCam (TransformComponent playerTrans, camera& cam, float dt, GLFWwindow* window);
 
         KeyMappings keys{};
         float moveSpeed{3.f};
