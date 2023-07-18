@@ -175,13 +175,13 @@ namespace engine
 
 
         auto sun = gameObject::makePointLight(2.0f);
-        sun.color = {1.0f, 1.0f, 1.f}; // yellowish 1 1 0.5
+        sun.color = {1.0f, 1.0f, 0.5f}; // yellowish 1 1 0.5
         //auto rotateSun = glm::rotate(glm::mat4(1.f), glm::radians(0.0f), glm::vec3(0.f, 0.f, 1.f));
         sun.transform.translation = glm::vec3(0.f, 0.0f, 3.0f);
         gameObjects.emplace(sun.getId(), std::move(sun));
 
         auto moon = gameObject::makePointLight(2.0f);
-        moon.color = {1.0f, 1.0f, 1.0f}; // blueish 0.7 0.7 1
+        moon.color = {0.7f, 0.7f, 1.0f}; // blueish 0.7 0.7 1
         //auto rotateMoon = glm::rotate(glm::mat4(1.f), glm::radians(270.0f), glm::vec3(0.f, 0.f, 1.f));
         moon.transform.translation = glm::vec3(0.f, 0.0f, -3.0f); // opposite positions of start for sun and moon
         gameObjects.emplace(moon.getId(), std::move(moon));
