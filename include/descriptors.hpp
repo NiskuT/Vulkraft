@@ -14,13 +14,13 @@ namespace engine
     First class : engineDescriptorSetLayout
     defines the structure and bindings of the descriptors in a set
     */
-    class engineDescriptorSetLayout 
+    class engineDescriptorSetLayout
     {
     public:
-        class Builder 
+        class Builder
         {
-            public:
-                Builder(engineDevice &device) : device{device} {}
+        public:
+            Builder(engineDevice &device) : device{device} {}
 
             Builder &addBinding(
                 uint32_t binding,
@@ -40,7 +40,7 @@ namespace engine
         ~engineDescriptorSetLayout();
         engineDescriptorSetLayout(const engineDescriptorSetLayout &) = delete;
         engineDescriptorSetLayout &operator=(const engineDescriptorSetLayout &) = delete;
-        // retrieve the layout 
+        // retrieve the layout
         VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
     private:
@@ -53,15 +53,17 @@ namespace engine
 
     /*
     Second class : engineDescriptorPool
-    manages allocation & deallocation of the descriptors sets 
+    manages allocation & deallocation of the descriptors sets
     */
 
-    class engineDescriptorPool {
+    class engineDescriptorPool
+    {
+    public:
+        // Builder class to manage the pool with given properties
+        class Builder
+        {
         public:
-            // Builder class to manage the pool with given properties 
-            class Builder {
-                public:
-                    Builder(engineDevice &device) : device{device} {}
+            Builder(engineDevice &device) : device{device} {}
 
             Builder &addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder &setPoolFlags(VkDescriptorPoolCreateFlags flags);
@@ -100,17 +102,18 @@ namespace engine
 
     /*
     Third class : engineDescriptorWriter
-    To write data in a descriptor set, needs the descriptor pool to have all the sets and the layouts of the sets to access it 
+    To write data in a descriptor set, needs the descriptor pool to have all the sets and the layouts of the sets to access it
     */
-    class engineDescriptorWriter {
-        public:
-            engineDescriptorWriter(engineDescriptorSetLayout &setLayout, engineDescriptorPool &pool);
+    class engineDescriptorWriter
+    {
+    public:
+        engineDescriptorWriter(engineDescriptorSetLayout &setLayout, engineDescriptorPool &pool);
 
         engineDescriptorWriter &writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo);
         engineDescriptorWriter &writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo);
 
-            bool build(VkDescriptorSet &set); // build a new descriptor set
-            void overwrite(VkDescriptorSet &set); // overwrite an existing set
+        bool build(VkDescriptorSet &set);     // build a new descriptor set
+        void overwrite(VkDescriptorSet &set); // overwrite an existing set
 
     private:
         engineDescriptorSetLayout &setLayout;
