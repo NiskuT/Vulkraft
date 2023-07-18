@@ -5,6 +5,7 @@
 #include <vulkan/vulkan.h>
 
 #include "gameObject.hpp"
+#include "visibleWorld.hpp"
 
 namespace engine {
 
@@ -31,6 +32,7 @@ namespace engine {
         camera& myCamera;
         VkDescriptorSet globalDescriptorSet;
         gameObject::Map& gameObjects;
+        visibleWorld& myWorld;
     };
 
 }  // namespace engine

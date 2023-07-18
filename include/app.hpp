@@ -6,6 +6,7 @@
 #include "renderer.hpp"
 #include "descriptors.hpp"
 #include "engineTexture.hpp"
+#include "visibleWorld.hpp"
 
 
 #include <memory>
@@ -36,10 +37,14 @@ namespace engine
             engineDevice device{window}; // and we initialize the environment for the present device (swap chain for example)
             renderer engineRenderer{window, device}; // initializes the renderer with the window and present device 
 
+            std::shared_ptr<visibleWorld> myWorld;
+
             // Order of declaration is important here
-            std::unique_ptr<engineDescriptorPool> globalPool{}; // 
+            std::unique_ptr<engineDescriptorPool> globalPool{};
+            std::unique_ptr<engineDescriptorPool> blockPool{};
             gameObject::Map gameObjects; // map of all the gameObjects present in the scene 
-            std::unique_ptr<engineTexture> textures; // unique pointer to the textures 
+            std::unique_ptr<engineTexture> textures; // unique pointer to steve textures    
+            std::unique_ptr<engineTexture> blockTexture;  // unique pointer to the block textures 
 
     };
 }

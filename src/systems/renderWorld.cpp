@@ -1,9 +1,11 @@
-#include "systems/renderSystem.hpp"
+#include "systems/renderWorld.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+
+#include "block.hpp"
 
 #include <stdexcept>
 #include <array>
@@ -21,19 +23,19 @@ namespace engine
         glm::mat4 normalMatrix{1.f};
     };
     
-    renderSystem::renderSystem(engineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+    renderWorld::renderWorld(engineDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
         : device{device}
     {
         createPipelineLayout(globalSetLayout);
         createPipeline(renderPass);
     }
 
-    renderSystem::~renderSystem()
+    renderWorld::~renderWorld()
     {
         vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
     }
 
-    void renderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+    void renderWorld::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
     {
 
         VkPushConstantRange pushConstantRange{};
@@ -56,21 +58,30 @@ namespace engine
         }
     }
 
-    void renderSystem::createPipeline(VkRenderPass renderPass)
+    void renderWorld::createPipeline(VkRenderPass renderPass)
     {
         assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
         pipelineConfigInfo pipelineConfig{};
         pipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipelineConfig.attributeDescriptions.clear();
+        pipelineConfig.bindingDescriptions.clear();
+
+        pipelineConfig.attributeDescriptions = engine::block::Vertex::getAttributeDescriptions();
+        pipelineConfig.bindingDescriptions = engine::block::Vertex::getBindingDescriptions();
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        p_pipeline = std::make_unique<pipeline>(device, SHADER_PATH "simple_shaders.vert.spv",SHADER_PATH "simple_shaders.frag.spv", pipelineConfig);
+        p_pipeline = std::make_unique<pipeline>(device, SHADER_PATH "block_shaders.vert.spv", SHADER_PATH "block_shaders.frag.spv", pipelineConfig);
     }
 
-    void renderSystem::renderGameObjects(FrameInfo& frameInfo)
+
+    void renderWorld::renderVisibleWorld(FrameInfo& frameInfo)
     {
         p_pipeline->bind(frameInfo.commandBuffer);
+
+        int playerX = static_cast<int>(frameInfo.myCamera.getPosition().x);
+        int playerY = static_cast<int>(frameInfo.myCamera.getPosition().y);
 
         vkCmdBindDescriptorSets(
             frameInfo.commandBuffer,
@@ -82,16 +93,12 @@ namespace engine
             0,
             nullptr);
 
-        for (auto& kv : frameInfo.gameObjects)
+        auto chunkToRender = frameInfo.myWorld.getChunkToRender();
+        for (auto& currChunk : chunkToRender)
         {
-            auto& obj = kv.second;
-            if (obj.model == nullptr)
-            {
-                continue;
-            }
             SimplePushConstantData push{};
-            push.modelMatrix = obj.transform.mat4();
-            push.normalMatrix = obj.transform.normalMatrix();
+            push.modelMatrix = currChunk->transform.mat4();
+            push.normalMatrix = currChunk->transform.normalMatrix();
 
             vkCmdPushConstants(
                 frameInfo.commandBuffer,
@@ -100,8 +107,8 @@ namespace engine
                 0,
                 sizeof(SimplePushConstantData),
                 &push);
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+            currChunk->bind(frameInfo.commandBuffer);
+            currChunk->draw(frameInfo.commandBuffer);
         }
     }
 

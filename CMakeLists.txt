@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 3.11.0)
 
 set(NAME Vulkraft)
 
+add_compile_definitions(TEXTURE_PATH="${CMAKE_SOURCE_DIR}/textures/")
+add_compile_definitions(SHADER_PATH="${CMAKE_SOURCE_DIR}/shaders/")
+add_compile_definitions(MODEL_PATH="${CMAKE_SOURCE_DIR}/models/")
+
 message(STATUS "using ${CMAKE_GENERATOR}")
 if (CMAKE_GENERATOR STREQUAL "MinGW Makefiles")
     if (NOT MINGW_PATH) 
