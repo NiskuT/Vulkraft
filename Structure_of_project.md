@@ -1,6 +1,25 @@
-# structure of the project (by Chloé)
+# structure of the project
 
-main -> app
+## general notes :
+* ```#pragma once ``` ensures the header file is included only once during compilation to prevent duplicate definitions.
+
+* Swap chain in Vulkan : to manage the presentation of images onto the screen 
+Rendering involves creating a series of images=frames to present the on the screen -> directly render them can be inefficient -> need of swap chain as intermediary between the application and the device. 
+The swap chain helps synchronizing the rendering process with the display refresh rate.
+
+* Descriptor in Vulkan : resource accessed by the shaders during rendering process to connect shaders variables with corresponding resources (lights, textures...)
+Descriptors are in sets, containing >=1 bindings, specifying a specific resource -> unique binding index with particular type of resource 
+A descriptor pool manages the allocation and deallocation of the sets.
+During rendering, shaders can access descriptors and allow them to read from or write to resources like buffers or textures during rendering pipeline
+## general use of libraries : 
+
+- <tiny_obj_loader.h> : allows to load 3D models from .obj
+- <glm/gtx/hash.hpp> : to include hashing functions -> used for example in the engine Model, to create a seed for the generation of the world 
+- <cassert> : allows to use the 'assert' function to display error messages after a test 
+
+
+## main 
+-> app
 
 ## app : 
 
@@ -80,3 +99,7 @@ createtextureimageview() line 2349
 createtexturesampler() line 2358
 texture init line 2387
 texture init cubic line 2397
+
+
+## engineModel 
+

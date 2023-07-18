@@ -32,14 +32,14 @@ namespace engine
             void loadGameObjects();
             void loadTextures();
 
-            gameWindow window{WIDTH, HEIGHT, "Vulkraft"};
-            engineDevice device{window};
-            renderer engineRenderer{window, device};
+            gameWindow window{WIDTH, HEIGHT, "Vulkraft"}; // we create the window here 
+            engineDevice device{window}; // and we initialize the environment for the present device (swap chain for example)
+            renderer engineRenderer{window, device}; // initializes the renderer with the window and present device 
 
             // Order of declaration is important here
-            std::unique_ptr<engineDescriptorPool> globalPool{};
-            gameObject::Map gameObjects;
-            std::unique_ptr<engineTexture> textures;      
+            std::unique_ptr<engineDescriptorPool> globalPool{}; // 
+            gameObject::Map gameObjects; // map of all the gameObjects present in the scene 
+            std::unique_ptr<engineTexture> textures; // unique pointer to the textures 
 
     };
 }
