@@ -15,6 +15,14 @@
 #include <stdexcept>
 #include <chrono>
 #include <array>
+#include <iostream>
+
+#ifndef TEXTURE_PATH
+  #define TEXTURE_PATH "textures/"
+#endif
+#ifndef MODEL_PATH
+  #define MODEL_PATH "models/"
+#endif
 
 #define MAX_FRAME_TIME 0.05f
 
@@ -22,6 +30,7 @@ namespace engine
 {
     app::app()
     {
+        std::cout << "path to model: " << MODEL_PATH << std::endl;
         globalPool = engineDescriptorPool::Builder(device)
             .setMaxSets(swapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, swapChain::MAX_FRAMES_IN_FLIGHT)
@@ -150,7 +159,7 @@ namespace engine
     void app::loadGameObjects()
     {
         //we create the first object of the scene : the player 
-        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, "models/smallSteve.obj");
+        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, MODEL_PATH "smallSteve.obj");
         auto Steve = gameObject::createGameObject();
         Steve.model = SteveModel;
         // first transformations on steve in order to place him in the scene 
@@ -189,10 +198,10 @@ namespace engine
 
     void app::loadTextures()
     {
-        auto textureFilepath = "textures/minecraftGrass.png";
+        auto textureFilepath = TEXTURE_PATH "minecraftGrass.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
 
-        auto texturePath = "C:\\Users\\qjupi\\Desktop\\Vulkraft\\textures\\blockTextureAlpha.png";
+        auto texturePath = TEXTURE_PATH "blockTextureAlpha.png";
         blockTexture = engineTexture::createTextureFromFile(device, texturePath);
     }
 

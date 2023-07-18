@@ -10,6 +10,10 @@
 #include <cassert>
 #include <map>
 
+#ifndef SHADER_PATH
+  #define SHADER_PATH "shaders/"
+#endif
+
 namespace engine 
 {
     struct PointLightPushConstants
@@ -66,7 +70,7 @@ namespace engine
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        p_pipeline = std::make_unique<pipeline>(device, "shaders/point_light.vert.spv", "shaders/point_light.frag.spv", pipelineConfig);
+        p_pipeline = std::make_unique<pipeline>(device, SHADER_PATH "point_light.vert.spv", SHADER_PATH "point_light.frag.spv", pipelineConfig);
     }
 
     void pointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)

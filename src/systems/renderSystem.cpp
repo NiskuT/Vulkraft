@@ -8,6 +8,10 @@
 #include <stdexcept>
 #include <array>
 
+#ifndef SHADER_PATH
+  #define SHADER_PATH "shaders/"
+#endif
+
 namespace engine 
 {
 
@@ -61,7 +65,7 @@ namespace engine
 
         pipelineConfig.renderPass = renderPass;
         pipelineConfig.pipelineLayout = pipelineLayout;
-        p_pipeline = std::make_unique<pipeline>(device, "shaders/simple_shaders.vert.spv", "shaders/simple_shaders.frag.spv", pipelineConfig);
+        p_pipeline = std::make_unique<pipeline>(device, SHADER_PATH "simple_shaders.vert.spv",SHADER_PATH "simple_shaders.frag.spv", pipelineConfig);
     }
 
     void renderSystem::renderGameObjects(FrameInfo& frameInfo)
