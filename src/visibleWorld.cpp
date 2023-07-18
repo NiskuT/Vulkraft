@@ -22,9 +22,9 @@ namespace engine
         {
             chunkX = newChunkX;
             chunkZ = newChunkZ;
-            for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
+            for (int x = chunkX - renderDistance - 1; x <= chunkX + renderDistance; x++)
             {
-                for (int z = chunkZ - renderDistance; z <= chunkZ + renderDistance; z++)
+                for (int z = chunkZ - renderDistance - 1; z <= chunkZ + renderDistance; z++)
                 {
                     auto key = std::make_pair(x, z);
                     if (map.find(key) == map.end())
@@ -37,9 +37,9 @@ namespace engine
 
         std::vector<std::pair<int, int>> chunkInUse;
         chunkToRender.clear();
-        for (int x = chunkX - renderDistance; x <= chunkX + renderDistance; x++)
+        for (int x = chunkX - renderDistance - 1; x <= chunkX + renderDistance; x++)
         {
-            for (int z = chunkZ - renderDistance; z <= chunkZ + renderDistance; z++)
+            for (int z = chunkZ - renderDistance - 1; z <= chunkZ + renderDistance; z++)
             {
                 auto key = std::make_pair(x, z);
                 if (map.find(key) == map.end())

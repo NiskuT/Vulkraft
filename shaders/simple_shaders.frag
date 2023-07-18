@@ -64,5 +64,5 @@ void main()
     
     vec3 finalColor = fragColor * texture(texSampler, fragUv).rbg;
     outColor = vec4(diffuseLight* finalColor + specularLight * finalColor, 1.0);
-    outColor = texture(texSampler, fragUv);
+    //outColor = texture(texSampler, fragUv);
 }

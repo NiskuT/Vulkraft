@@ -8,7 +8,7 @@
 
 namespace engine
 {
-    chunk::chunk(engineDevice& device, int x, int z) : device{device}, x(x), z(z)
+    chunk::chunk(engineDevice &device, int x, int z) : device{device}, x(x), z(z)
     {
         transform.scale = glm::vec3(.1f, .1f, .1f);
         for (int j = 0; j < 4; j++)
@@ -17,7 +17,14 @@ namespace engine
             {
                 for (int k = 0; k < CHUNK_SIZE; k++)
                 {
-                    addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::GRASS);
+                    if (i == 0 || i == CHUNK_SIZE || k == 0 || k == CHUNK_SIZE)
+                    {
+                        addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::WATER);
+                    }
+                    else
+                    {
+                        addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::GRASS);
+                    }
                 }
             }
         }
@@ -35,10 +42,8 @@ namespace engine
         {
             addBlock(x * CHUNK_SIZE, 0, z * CHUNK_SIZE+i, BlockType::SAND);
         }*/
- 
-        addBlock(x * CHUNK_SIZE+15, 0, z * CHUNK_SIZE+15, BlockType::SAND);
 
-        
+        addBlock(x * CHUNK_SIZE + 15, 0, z * CHUNK_SIZE + 15, BlockType::SAND);
     }
 
     void chunk::addBlock(int worldX, int worldY, int worldZ, BlockType blockType)
@@ -49,9 +54,9 @@ namespace engine
         chunkNeedsUpdate = true;
     }
 
-    void chunk::updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>>& chunks)
+    void chunk::updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>> &chunks)
     {
-        for (auto& block : blocks)
+        for (auto &block : blocks)
         {
             block.second.updateBlockFacesVisible(chunks);
         }
@@ -66,29 +71,50 @@ namespace engine
         return blocks.find(key) != blocks.end();
     }
 
-    unsigned long int chunk::hashFunction(int x, int y, int z) {
+    unsigned long int mix(int a, int b)
+    {
+        unsigned int ha = static_cast<unsigned int>(a);
+        unsigned int hb = static_cast<unsigned int>(b);
+        ha = (ha ^ 61) ^ (ha >> 16);
+        ha = ha + (ha << 3);
+        ha = ha ^ (ha >> 4);
+        ha = ha * 0x27d4eb2d;
+        hb = (hb ^ 61) ^ (hb >> 16);
+        hb = hb + (hb << 3);
+        hb = hb ^ (hb >> 4);
+        hb = hb * 0x27d4eb2d;
+        unsigned long int result = ha + (hb * 0x0000013b);
+        return result;
+    }
+
+    unsigned long int chunk::hashFunction(int x, int y, int z)
+    {
+        int dx = std::abs(x) % 16;
+        int dy = std::abs(y) % 16;
+        int dz = std::abs(z) % 16;
+
         size_t seed = 0;
         std::hash<int> hasher;
 
-        seed ^= hasher(x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= hasher(y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        seed ^= hasher(z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= mix(x, dx) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= mix(y, dy) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= mix(z, dz) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 
         return static_cast<unsigned long int>(seed);
     }
 
     void chunk::getChunkMesh(
-        std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
-        std::vector<block::Vertex>& vertices, 
-        std::vector<uint32_t>& indices)
+        std::unordered_map<block::Vertex, uint32_t> &uniqueVertices,
+        std::vector<block::Vertex> &vertices,
+        std::vector<uint32_t> &indices)
     {
-        for (auto& block : blocks)
+        for (auto &block : blocks)
         {
             block.second.addVerticesToBuffer(uniqueVertices, vertices, indices);
         }
     }
 
-    void chunk::updateVertexBuffers(const std::vector<block::Vertex>& vertices)
+    void chunk::updateVertexBuffers(const std::vector<block::Vertex> &vertices)
     {
         vertexCount = static_cast<uint32_t>(vertices.size());
         assert(vertexCount >= 3 && "Vertex count must be at least 3");
@@ -97,10 +123,10 @@ namespace engine
         uint32_t vertexSize = sizeof(vertices[0]);
 
         vulkanBuffer stagingBuffer(
-            device, 
-            vertexSize, 
+            device,
+            vertexSize,
             vertexCount,
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         stagingBuffer.map();
@@ -112,16 +138,16 @@ namespace engine
         }
 
         vertexBuffer = std::make_unique<vulkanBuffer>(
-            device, 
-            vertexSize, 
+            device,
+            vertexSize,
             vertexCount,
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         device.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
     }
 
-    void chunk::updateIndexBuffers(const std::vector<uint32_t>& indices)
+    void chunk::updateIndexBuffers(const std::vector<uint32_t> &indices)
     {
         indexCount = static_cast<uint32_t>(indices.size());
 
@@ -129,12 +155,12 @@ namespace engine
         uint32_t indexSize = sizeof(indices[0]);
 
         vulkanBuffer stagingBuffer(
-            device, 
-            indexSize, 
+            device,
+            indexSize,
             indexCount,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT, // this buffer will be used just has a source location for a memory transfer
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-        
+
         stagingBuffer.map();
         stagingBuffer.writeToBuffer((void *)indices.data());
 
@@ -144,10 +170,10 @@ namespace engine
         }
 
         indexBuffer = std::make_unique<vulkanBuffer>(
-            device, 
-            indexSize, 
+            device,
+            indexSize,
             indexCount,
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
         device.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);

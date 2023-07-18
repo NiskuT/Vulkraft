@@ -172,38 +172,76 @@ namespace engine
         int myChunkX = pos[0] / CHUNK_SIZE;
         int myChunkZ = pos[2] / CHUNK_SIZE;
 
-        if (pos[0] < 0) myChunkX -= 1;
-        if (pos[2] < 0) myChunkZ -= 1;
-        //std::cout << "myChunkX: " << myChunkX << " myChunkZ: " << myChunkZ << std::endl;
+        int tmpX = pos[0], tmpZ = pos[2];
 
+        if (pos[0] < 0) 
+        {
+            tmpX += 1;
+            myChunkX = tmpX / CHUNK_SIZE;
+            myChunkX -= 1;
+        }
+        if (pos[2] < 0)
+        {
+            tmpZ += 1;
+            myChunkZ = tmpZ / CHUNK_SIZE;
+            myChunkZ -= 1;
+        }
 
         // We first check that the block is note on the edge of the chunk
-        if (pos[0] % CHUNK_SIZE == 0) {
-            auto id = findChunkIndex(chunks, myChunkX - 1, myChunkZ);
-            if (id != -1) {
-                checkFaceInChunk(chunks[id]);
-            }
-        }
-        if (pos[0] % CHUNK_SIZE == CHUNK_SIZE - 1) {
+
+        // NEGATIVE CASE
+        if (pos[0] < 0 && tmpX % CHUNK_SIZE == 0) {
             auto id = findChunkIndex(chunks, myChunkX + 1, myChunkZ);
             if (id != -1) {
                 checkFaceInChunk(chunks[id]);
             }
         }
-        if (pos[2] % CHUNK_SIZE == 0) {
+        if (pos[0] < 0 && tmpX % CHUNK_SIZE == -CHUNK_SIZE + 1) {
+            auto id = findChunkIndex(chunks, myChunkX - 1, myChunkZ);
+            if (id != -1) {
+                checkFaceInChunk(chunks[id]);
+            }
+        }
+        if (pos[2] < 0 && tmpZ % CHUNK_SIZE == 0) {
+            auto id = findChunkIndex(chunks, myChunkX, myChunkZ + 1);
+            if (id != -1) {
+                checkFaceInChunk(chunks[id]);
+            }
+        }
+        if (pos[2] < 0 && tmpZ % CHUNK_SIZE == -CHUNK_SIZE + 1) {
             auto id = findChunkIndex(chunks, myChunkX, myChunkZ - 1);
             if (id != -1) {
                 checkFaceInChunk(chunks[id]);
             }
         }
-        if (pos[2] % CHUNK_SIZE == CHUNK_SIZE - 1) {
+
+        // POSITIVE CASE
+        if (pos[0] > 0 && tmpX % CHUNK_SIZE == 0) {
+            auto id = findChunkIndex(chunks, myChunkX - 1, myChunkZ);
+            if (id != -1) {
+                checkFaceInChunk(chunks[id]);
+            }
+        }
+        if (pos[0] > 0 && tmpX % CHUNK_SIZE == CHUNK_SIZE - 1) {
+            auto id = findChunkIndex(chunks, myChunkX + 1, myChunkZ);
+            if (id != -1) {
+                checkFaceInChunk(chunks[id]);
+            }
+        }
+        if (pos[2] > 0 && tmpZ % CHUNK_SIZE == 0) {
+            auto id = findChunkIndex(chunks, myChunkX, myChunkZ - 1);
+            if (id != -1) {
+                checkFaceInChunk(chunks[id]);
+            }
+        }
+        if (pos[2] > 0 && tmpZ % CHUNK_SIZE == CHUNK_SIZE - 1) {
             auto id = findChunkIndex(chunks, myChunkX, myChunkZ + 1);
             if (id != -1) {
                 checkFaceInChunk(chunks[id]);
             }
         }
 
-
+        // General case
         auto id = findChunkIndex(chunks, myChunkX, myChunkZ);
         if (id != -1) {
             checkFaceInChunk(chunks[id]);
