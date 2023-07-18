@@ -25,6 +25,13 @@ namespace engine
             bool isThereABlockAt(int worldX, int worldY, int worldZ);
 
             void getPosition(int& x, int& z) { x = this->x; z = this->z; };
+            int getX() const { return x; };
+            int getZ() const { return z; };
+
+            bool operator==(const chunk& other) const
+            {
+                return x == other.getX() && z == other.getZ();
+            }
 
             void bind(VkCommandBuffer commandBuffer);
             void draw(VkCommandBuffer commandBuffer);
@@ -36,11 +43,6 @@ namespace engine
             bool isChunkLoaded() { return chunkIsLoaded; };
 
             TransformComponent transform{};
-
-            void getChunkMesh(
-                std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
-                std::vector<block::Vertex>& vertices, 
-                std::vector<uint32_t>& indices);
 
         private:
             unsigned long int hashFunction(int x, int y, int z);
@@ -58,6 +60,11 @@ namespace engine
 
             void updateVertexBuffers(const std::vector<block::Vertex>& vertices);
             void updateIndexBuffers(const std::vector<uint32_t>& indices);
+
+            void getChunkMesh(
+                std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
+                std::vector<block::Vertex>& vertices, 
+                std::vector<uint32_t>& indices);
 
     };
 }

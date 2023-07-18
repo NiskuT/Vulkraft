@@ -4,6 +4,7 @@
 #include <random>
 
 #include "utils.hpp"
+#include <iostream>
 
 namespace engine
 {
@@ -30,10 +31,13 @@ namespace engine
 
             }
         }*/
-        for (int i = 0; i < CHUNK_SIZE/2; i++)
+        /*for (int i = 0; i < CHUNK_SIZE/2; i++)
         {
             addBlock(x * CHUNK_SIZE, 0, z * CHUNK_SIZE+i, BlockType::SAND);
-        }
+        }*/
+ 
+        addBlock(x * CHUNK_SIZE+15, 0, z * CHUNK_SIZE+15, BlockType::SAND);
+
         
     }
 

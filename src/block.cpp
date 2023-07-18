@@ -5,7 +5,6 @@
 
 #include "utils.hpp"
 #include <iostream>
-#include <bitset>
 
 namespace engine
 {
@@ -173,6 +172,11 @@ namespace engine
         int myChunkX = pos[0] / CHUNK_SIZE;
         int myChunkZ = pos[2] / CHUNK_SIZE;
 
+        if (pos[0] < 0) myChunkX -= 1;
+        if (pos[2] < 0) myChunkZ -= 1;
+        //std::cout << "myChunkX: " << myChunkX << " myChunkZ: " << myChunkZ << std::endl;
+
+
         // We first check that the block is note on the edge of the chunk
         if (pos[0] % CHUNK_SIZE == 0) {
             auto id = findChunkIndex(chunks, myChunkX - 1, myChunkZ);
@@ -199,15 +203,12 @@ namespace engine
             }
         }
 
-        // Then if the block is inside the chunk
-        if (pos[0] % CHUNK_SIZE != 0 && pos[0] % CHUNK_SIZE != CHUNK_SIZE - 1 && pos[2] % CHUNK_SIZE != 0 && pos[2] % CHUNK_SIZE != CHUNK_SIZE - 1) {
-            auto id = findChunkIndex(chunks, myChunkX, myChunkZ);
-            if (id != -1) {
-                checkFaceInChunk(chunks[id]);
-            }
+
+        auto id = findChunkIndex(chunks, myChunkX, myChunkZ);
+        if (id != -1) {
+            checkFaceInChunk(chunks[id]);
         }
-        // Binary cout of blockFacesVisible
-        std::cout << "blockFacesVisible: " << std::bitset<6>(blockFacesVisible) << std::endl;
+
     }
 
 
