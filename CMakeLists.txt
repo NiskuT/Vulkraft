@@ -58,10 +58,9 @@ else()
 	message(STATUS "Using glfw lib at: ${GLFW_LIB}")
 endif()
 
-include_directories(external)
-
 set(TINYOBJ_PATH 3rdParty/tinyobjloader)
 set(STB_PATH 3rdParty/stb)
+set(PERLIN_PATH 3rdParty/perlin)
 
 file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
@@ -90,6 +89,7 @@ if (WIN32)
     ${GLFW_INCLUDE_DIRS}
     ${TINYOBJ_PATH}
     ${STB_PATH}
+    ${PERLIN_PATH}
     ${GLM_PATH}
     )
 
@@ -105,6 +105,7 @@ elseif (UNIX)
       ${PROJECT_SOURCE_DIR}/src
       ${TINYOBJ_PATH}
       ${STB_PATH}
+      ${PERLIN_PATH}
     )
     target_link_libraries(${PROJECT_NAME} glfw ${Vulkan_LIBRARIES})
 endif()

@@ -3,15 +3,24 @@
 #include "block.hpp"
 #include "utils.hpp"
 
-#include <iostream>
+#include <random>
+#include <stdexcept>
 
 namespace engine
 {
 
-    visibleWorld::visibleWorld(engineDevice &device, int playerX, int playerZ) : device{device}
+    visibleWorld::visibleWorld(engineDevice &device, unsigned char mode, int playerX, int playerZ) : device{device}
     {
         chunkX = playerX / CHUNK_SIZE;
         chunkZ = playerZ / CHUNK_SIZE;
+
+        if (mode == 1) {
+            auto seed = std::random_device()();
+            perlin = std::make_shared<siv::PerlinNoise>(seed);
+        }
+        else if (mode != 0 && mode != 1) {
+            throw std::runtime_error("ERROR: invalid mode");
+        }
     }
 
     void visibleWorld::updateWorldMesh(int playerX, int playerZ, int renderDistance)
@@ -29,7 +38,7 @@ namespace engine
                     auto key = std::make_pair(x, z);
                     if (map.find(key) == map.end())
                     {
-                        map.emplace(key, std::make_shared<chunk>(device, x, z));
+                        map.emplace(key, std::make_shared<chunk>(device, x, z, perlin));
                     }
                 }
             }
@@ -44,7 +53,7 @@ namespace engine
                 auto key = std::make_pair(x, z);
                 if (map.find(key) == map.end())
                 {
-                    std::cout << "ERROR: chunk not found" << std::endl;
+                    throw std::runtime_error("ERROR: chunk not found in the list of generated chunks");
                 }
                 if (map[key]->doesChunkNeedUpdate())
                 {
@@ -54,6 +63,7 @@ namespace engine
                 if (!map[key]->isChunkLoaded())
                 {
                     map[key]->updateChunkMesh();
+                    chunkLoaded.push_back(key);
                 }
                 chunkInUse.push_back(key);
                 chunkToRender.push_back(map[key]);

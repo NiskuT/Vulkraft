@@ -4,10 +4,11 @@
 
 #include "engineDevice.hpp"
 
+#include <PerlinNoise.hpp>
+
 #include <vector>
 #include <memory>
 #include <unordered_map>
-#include <functional>
 
 namespace std
 {
@@ -27,7 +28,7 @@ namespace engine
     class visibleWorld
     {
     public:
-        visibleWorld(engineDevice& device, int playerX = 0, int playerY = 0);
+        visibleWorld(engineDevice& device, unsigned char mode = 0, int playerX = 0, int playerY = 0);
         ~visibleWorld() = default;
 
         visibleWorld(const visibleWorld&) = delete;
@@ -45,7 +46,12 @@ namespace engine
         int chunkX, chunkZ;
         engineDevice& device;
 
+        std::shared_ptr<siv::PerlinNoise> perlin{nullptr};
+
         void clearUnuseChunk(std::vector<std::pair<int, int>> chunkInUse);
+
+        int generateFlatWorld(int x, int z);
+        int generateRandomWorld(int x, int z);
 
     };
 }

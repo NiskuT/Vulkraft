@@ -1,49 +1,150 @@
 #include "chunk.hpp"
 
-#include <functional>
 #include <random>
 
 #include "utils.hpp"
 #include <iostream>
+#include <cmath>
+
+#define PERLIN_OCTAVE 6
+#define FREQUENCY 0.025f
+#define SEA_FREQUENCY 0.005f
+#define SEA_LEVEL 0
+#define HEIGHT_DIFF 0.2f
+#define SLOPE 2.f
+#define HF_OFFSET 0.3f
 
 namespace engine
 {
-    chunk::chunk(engineDevice &device, int x, int z) : device{device}, x(x), z(z)
+    chunk::chunk(engineDevice &device, int x, int z, std::shared_ptr<siv::PerlinNoise> perlin)
+        : device{device}, x(x), z(z), perlin{perlin}
     {
         transform.scale = glm::vec3(.1f, .1f, .1f);
-        for (int j = 0; j < 4; j++)
+
+        if (perlin == nullptr)
         {
-            for (int i = 0; i < CHUNK_SIZE; i++)
+            generateFlatWorld();
+        }
+        else
+        {
+            generateRandomWorld();
+        }
+    }
+
+    void chunk::generateFlatWorld()
+    {
+        for (int i = 0; i < CHUNK_SIZE; i++)
+        {
+            for (int j = 0; j < CHUNK_SIZE; j++)
             {
-                for (int k = 0; k < CHUNK_SIZE; k++)
+                addBlock(x * CHUNK_SIZE + i, CHUNK_MAX_Y + 5, z * CHUNK_SIZE + j, BlockType::BEDROCK);
+                for (int k = CHUNK_MAX_Y + 4; k > CHUNK_MAX_Y; k--)
                 {
-                    if (i == 0 || i == CHUNK_SIZE || k == 0 || k == CHUNK_SIZE)
+                    addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::DIRT);
+                }
+                addBlock(x * CHUNK_SIZE + i, CHUNK_MAX_Y, z * CHUNK_SIZE + j, BlockType::GRASS);
+            }
+        }
+    }
+
+    float slopeModifier(float valX)
+    {
+        //return (0.6f * (1.f - std::sin(valX/(2.f * M_PI))) + 0.4f) - 1.f;
+        //return std::sin(valX * 2.f * M_PI);
+        return 0.6f * (std::exp(10*valX) - 1.f);
+    }
+
+    void chunk::generateRandomWorld()
+    {
+        const float b = 0.4f;
+        for (int i = 0; i < CHUNK_SIZE; i++)
+        {
+            for (int j = 0; j < CHUNK_SIZE; j++)
+            {
+                float BF = perlin->normalizedOctave2D((float)(x * CHUNK_SIZE + i) * SEA_FREQUENCY, (float)(z * CHUNK_SIZE + j) * SEA_FREQUENCY, 1);
+                float HF = (1 - b) * perlin->normalizedOctave2D_01((float)(x * CHUNK_SIZE + i) * FREQUENCY, (float)(z * CHUNK_SIZE + j) * FREQUENCY, 1) 
+                           + b * perlin->normalizedOctave2D_01((float)(x * CHUNK_SIZE + i) * FREQUENCY * 2, (float)(z * CHUNK_SIZE + j) * FREQUENCY, PERLIN_OCTAVE) - HF_OFFSET;
+
+
+                if (BF > SEA_LEVEL)
+                {
+                    float height = (1-HEIGHT_DIFF)*HF + HEIGHT_DIFF * BF;
+                        
+                    height *= -1 * CHUNK_MAX_Y;
+                    for (int k = CHUNK_MAX_Y; k > (int)height; k--)
                     {
-                        addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::WATER);
+                        addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::DIRT);
+                    }
+                    addBlock(x * CHUNK_SIZE + i, height, z * CHUNK_SIZE + j, BlockType::GRASS);
+                    if (rand() % 1000 < 5)
+                    {
+                        generateTree(x * CHUNK_SIZE + i, height - 1, z * CHUNK_SIZE + j);
+                    }
+                } else {
+                    float height = ((1-HEIGHT_DIFF)*HF + HEIGHT_DIFF * BF);
+
+                    if (height > 0.f)
+                    {
+                        height *= std::pow((BF + 1.f), SLOPE);                    
                     }
                     else
                     {
-                        addBlock(x * CHUNK_SIZE + i, j, z * CHUNK_SIZE + k, BlockType::GRASS);
+                        height = height = slopeModifier(height);
+                    }
+
+                    height *= -1 * CHUNK_MAX_Y;
+
+                    for (int k = CHUNK_MAX_Y; k > (int)height; k--)
+                    {
+                        if (k < 0)
+                        {
+                            addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::GRASS);
+                        }
+                        else if (k >= 0 && k < 3)
+                        {
+                            addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::SAND);
+                        }
+                        else
+                        {
+                            addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::STONE);
+                        }
+                    }
+                    for (int k = (int)height; k >= 0; k--)
+                    {
+                        addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::WATER);
                     }
                 }
             }
         }
+    }
 
-        /*for (int i = 0; i < CHUNK_SIZE; i++)
+    void chunk::generateTree(int x, int y, int z)
+    {
+        const int TREE_HEIGHT = 7;
+        const int TREE_TOP_LEAVES = 3;
+        for (int i = 0; i < TREE_HEIGHT; ++i)
         {
-            for (int j = 0; j < CHUNK_SIZE; j++)
+            addBlock(x, y - i, z, BlockType::WOOD);
+        }
+
+        int leafStart = y - TREE_HEIGHT + TREE_TOP_LEAVES;
+        int leafEnd = y - TREE_HEIGHT - 1;
+
+        for (int dy = leafStart; dy > leafEnd; --dy)
+        {
+            int leafRadius = TREE_TOP_LEAVES + (dy - leafStart);
+
+            for (int dx = -leafRadius; dx <= leafRadius; ++dx)
             {
-                // 30 % chance of adding a block
-                addBlock(x * CHUNK_SIZE + i, z * CHUNK_SIZE + j, 4, BlockType::DIRT);
-
+                for (int dz = -leafRadius; dz <= leafRadius; ++dz)
+                {
+                    if (abs(dx) != leafRadius || abs(dz) != leafRadius)
+                    {
+                        addBlock(x + dx, dy, z + dz, BlockType::LEAVES);
+                    }
+                }
             }
-        }*/
-        /*for (int i = 0; i < CHUNK_SIZE/2; i++)
-        {
-            addBlock(x * CHUNK_SIZE, 0, z * CHUNK_SIZE+i, BlockType::SAND);
-        }*/
-
-        addBlock(x * CHUNK_SIZE + 15, 0, z * CHUNK_SIZE + 15, BlockType::SAND);
+        }
     }
 
     void chunk::addBlock(int worldX, int worldY, int worldZ, BlockType blockType)
@@ -67,8 +168,24 @@ namespace engine
     bool chunk::isThereABlockAt(int worldX, int worldY, int worldZ)
     {
         auto key = hashFunction(worldX, worldY, worldZ);
+        if (blocks.find(key) != blocks.end() && blocks[key].getBlockType() != BlockType::WATER && blocks[key].getBlockType() != BlockType::LEAVES)
+        {
+            return true;
+        }
+        return false;
 
-        return blocks.find(key) != blocks.end();
+        /*auto key = hashFunction(worldX, worldY, worldZ);
+        return blocks.find(key) != blocks.end();*/
+    }
+
+    bool chunk::isThereAWaterBlockAt(int worldX, int worldY, int worldZ)
+    {
+        auto key = hashFunction(worldX, worldY, worldZ);
+        if (blocks.find(key) != blocks.end() && blocks[key].getBlockType() == BlockType::WATER)
+        {
+            return true;
+        }
+        return false;
     }
 
     unsigned long int mix(int a, int b)

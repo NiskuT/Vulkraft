@@ -169,6 +169,7 @@ namespace engine
     void block::updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>>& chunks)
     {
         blockFacesVisible = 0b111111;
+
         int myChunkX = pos[0] / CHUNK_SIZE;
         int myChunkZ = pos[2] / CHUNK_SIZE;
 
@@ -185,6 +186,18 @@ namespace engine
             tmpZ += 1;
             myChunkZ = tmpZ / CHUNK_SIZE;
             myChunkZ -= 1;
+        }
+
+        // In case of water, we only need to check the top face, if it's under water we don't need to check anything else
+        if (blockType == BlockType::WATER)
+        {
+            blockFacesVisible = 0b000000;
+            auto id = findChunkIndex(chunks, myChunkX, myChunkZ);
+            if (!chunks[id]->isThereAWaterBlockAt(pos[0], pos[1] - 1, pos[2]))
+            {
+                blockFacesVisible = TOP_FACE;
+            }
+            return;
         }
 
         // We first check that the block is note on the edge of the chunk

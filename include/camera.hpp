@@ -16,7 +16,7 @@ namespace engine
         void setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f));
         void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 
-        void setAlpha (float a) {alphaCam = glm::clamp(a, -0.5f, 1.5f);} // we clamp alpha so the camera doesn't go under the floor, and in front of the player 
+        void setAlpha (float a) {alphaCam = glm::clamp(a, -1.5f, 1.5f);} // we clamp alpha so the camera doesn't go under the floor, and in front of the player 
         
         void updateBool () {firstBool = !firstBool; }
 
