@@ -163,9 +163,9 @@ namespace engine
         auto Steve = gameObject::createGameObject();
         Steve.model = SteveModel;
         // first transformations on steve in order to place him in the scene 
-        Steve.transform.translation = {0.0f, 0.5f, 1.0f};
+        Steve.transform.translation = {0.0f, -0.2f, 1.0f};
         Steve.transform.rotation = {0,0,glm::radians(180.0f)}; 
-        Steve.transform.scale = glm::vec3(0.3f);
+        Steve.transform.scale = glm::vec3(0.15f);
         //place him in the scene
         gameObjects.emplace(Steve.getId(), std::move(Steve));
 
@@ -187,16 +187,16 @@ namespace engine
         };
 
 
-        auto sun = gameObject::makePointLight(2.0f);
+        auto sun = gameObject::makePointLight(2.0f, 1.0f);
         sun.color = {1.0f, 1.0f, 0.5f}; // yellowish 1 1 0.5
         //auto rotateSun = glm::rotate(glm::mat4(1.f), glm::radians(0.0f), glm::vec3(0.f, 0.f, 1.f));
-        sun.transform.translation = glm::vec3(0.f, 0.0f, 3.0f);
+        sun.transform.translation = glm::vec3(0.f, 0.0f, 10.0f);
         gameObjects.emplace(sun.getId(), std::move(sun));
 
-        auto moon = gameObject::makePointLight(2.0f);
+        auto moon = gameObject::makePointLight(2.0f, 1.0f);
         moon.color = {0.7f, 0.7f, 1.0f}; // blueish 0.7 0.7 1
         //auto rotateMoon = glm::rotate(glm::mat4(1.f), glm::radians(270.0f), glm::vec3(0.f, 0.f, 1.f));
-        moon.transform.translation = glm::vec3(0.f, 0.0f, -3.0f); // opposite positions of start for sun and moon
+        moon.transform.translation = glm::vec3(0.f, 0.0f, -10.0f); // opposite positions of start for sun and moon
         gameObjects.emplace(moon.getId(), std::move(moon));
 
         /*for (int i = 0; i < lightColors.size(); i++)
@@ -211,7 +211,7 @@ namespace engine
 
     void app::loadTextures()
     {
-        auto textureFilepath = TEXTURE_PATH "minecraftGrass.png";
+        auto textureFilepath = TEXTURE_PATH "TextureSteve.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
 
         auto texturePath = TEXTURE_PATH "blockTextureAlpha.png";
