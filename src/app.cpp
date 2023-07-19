@@ -137,7 +137,7 @@ namespace engine
                 ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
                 auto position = myCamera.getPosition();
-                myWorld->updateWorldMesh(static_cast<int>(position.x * 10), static_cast<int>(position.z * 10), 3); // x, z, render distance
+                myWorld->updateWorldMesh(static_cast<int>(position.x * 10), static_cast<int>(position.z * 10), 4); // x, z, render distance
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 

@@ -168,14 +168,24 @@ namespace engine
     bool chunk::isThereABlockAt(int worldX, int worldY, int worldZ)
     {
         auto key = hashFunction(worldX, worldY, worldZ);
-        /*        auto key = hashFunction(worldX, worldY, worldZ);
-        if (blocks.find(key) != blocks.end() && blocks[key].getBlockType() != BlockType::WATER)
+        if (blocks.find(key) != blocks.end() && blocks[key].getBlockType() != BlockType::WATER && blocks[key].getBlockType() != BlockType::LEAVES)
         {
             return true;
         }
-        return false;*/
+        return false;
 
-        return blocks.find(key) != blocks.end();
+        /*auto key = hashFunction(worldX, worldY, worldZ);
+        return blocks.find(key) != blocks.end();*/
+    }
+
+    bool chunk::isThereAWaterBlockAt(int worldX, int worldY, int worldZ)
+    {
+        auto key = hashFunction(worldX, worldY, worldZ);
+        if (blocks.find(key) != blocks.end() && blocks[key].getBlockType() == BlockType::WATER)
+        {
+            return true;
+        }
+        return false;
     }
 
     unsigned long int mix(int a, int b)

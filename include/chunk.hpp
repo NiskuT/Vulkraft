@@ -27,6 +27,7 @@ namespace engine
             void addBlock(int worldX, int worldY, int worldZ, BlockType blockType);
             void updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>>& chunks);
             bool isThereABlockAt(int worldX, int worldY, int worldZ);
+            bool isThereAWaterBlockAt(int worldX, int worldY, int worldZ);
 
             void getPosition(int& x, int& z) { x = this->x; z = this->z; };
             int getX() const { return x; };
@@ -49,7 +50,6 @@ namespace engine
             TransformComponent transform{};
 
         private:
-            unsigned long int hashFunction(int x, int y, int z);
             int x, z;
             std::shared_ptr<siv::PerlinNoise> perlin{nullptr};
             std::unordered_map<unsigned long int, block> blocks;
@@ -68,6 +68,8 @@ namespace engine
 
             void generateFlatWorld();
             void generateRandomWorld();
+
+            static unsigned long int hashFunction(int x, int y, int z);
 
             void getChunkMesh(
                 std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 

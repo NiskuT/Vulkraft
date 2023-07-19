@@ -64,6 +64,7 @@ namespace engine
 
         pipelineConfigInfo pipelineConfig{};
         pipeline::defaultPipelineConfigInfo(pipelineConfig);
+        //pipeline::enableAlphaBlending(pipelineConfig);
         pipelineConfig.attributeDescriptions.clear();
         pipelineConfig.bindingDescriptions.clear();
 
