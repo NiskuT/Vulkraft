@@ -112,12 +112,15 @@ namespace engine
             frameTime = std::min(frameTime, MAX_FRAME_TIME);
 
             controller.moveInPlaneXZ(window.getGLFWwindow(), frameTime, viewerObjectPlayer); // to move the player 
-            glm::vec3 pos = controller.computePosCam(viewerObjectPlayer.transform, myCamera, frameTime, window.getGLFWwindow()); 
+
+            /*glm::vec3 pos = controller.computePosCam(viewerObjectPlayer.transform, myCamera, frameTime, window.getGLFWwindow()); 
             if(myCamera.getViewBool()) {
                 myCamera.setViewDirection(pos, glm::vec3( sin(viewerObjectPlayer.transform.rotation.y) *cos(myCamera.getAlpha()), 0.0f -sin(myCamera.getAlpha()) , cos(viewerObjectPlayer.transform.rotation.y)*cos(myCamera.getAlpha()))) ; 
             } else {
                 myCamera.setViewTarget(pos, viewerObjectPlayer.transform.translation + glm::vec3(0.0f, -0.5f, 0.0f)); 
-            }
+            }*/
+
+            controller.computePosCamMouse(viewerObjectPlayer.transform, myCamera, viewerObjectPlayer, window.getGLFWwindow());
             
             float aspect = engineRenderer.getAspectRatio();
 

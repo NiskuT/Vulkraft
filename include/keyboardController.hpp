@@ -27,11 +27,14 @@ namespace engine
 
         void moveInPlaneXZ(GLFWwindow* window, float dt, gameObject& object);
         glm::vec3 computePosCam (TransformComponent playerTrans, camera& cam, float dt, GLFWwindow* window);
+        glm::vec3 computePosCamMouse(TransformComponent& playerTrans, camera &cam, gameObject &player, GLFWwindow *window);
 
         KeyMappings keys{};
         float moveSpeed{3.f};
         float lookSpeed{1.5f};
-
+    private:
+        double prevMouseX{0.0};
+        double prevMouseY{0.0};
     };
     
     
