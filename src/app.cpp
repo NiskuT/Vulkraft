@@ -176,37 +176,15 @@ namespace engine
         floor.transform.scale = {3.0f, 1.0f, 3.0f};
         gameObjects.emplace(floor.getId(), std::move(floor));*/
 
-        // other objects in the scene : the moving point lights 
-        std::vector<glm::vec3> lightColors{
-            {1.f, .1f, .1f},
-            {.1f, .1f, 1.f},
-            {.1f, 1.f, .1f},
-            {1.f, 1.f, .1f},
-            {.1f, 1.f, 1.f},
-            {1.f, 1.f, 1.f}
-        };
 
-
-        auto sun = gameObject::makePointLight(2.0f, 1.0f);
-        sun.color = {1.0f, 1.0f, 0.5f}; // yellowish 1 1 0.5
-        //auto rotateSun = glm::rotate(glm::mat4(1.f), glm::radians(0.0f), glm::vec3(0.f, 0.f, 1.f));
-        sun.transform.translation = glm::vec3(0.f, 0.0f, 10.0f);
+        auto sun = gameObject::makePointLight(2.0f, 3.0f, {1.0f, 1.0f, 0.5f});
+        sun.transform.translation = glm::vec3(0.f, 0.0f, 30.0f);
         gameObjects.emplace(sun.getId(), std::move(sun));
 
-        auto moon = gameObject::makePointLight(2.0f, 1.0f);
-        moon.color = {0.7f, 0.7f, 1.0f}; // blueish 0.7 0.7 1
-        //auto rotateMoon = glm::rotate(glm::mat4(1.f), glm::radians(270.0f), glm::vec3(0.f, 0.f, 1.f));
-        moon.transform.translation = glm::vec3(0.f, 0.0f, -10.0f); // opposite positions of start for sun and moon
+        auto moon = gameObject::makePointLight(2.0f, 1.0f, {0.7f, 0.7f, 1.0f});
+        moon.transform.translation = glm::vec3(0.f, 0.0f, -30.0f); // opposite positions of start for sun and moon
         gameObjects.emplace(moon.getId(), std::move(moon));
 
-        /*for (int i = 0; i < lightColors.size(); i++)
-        {
-            auto pointLight = gameObject::makePointLight(0.5f);
-            pointLight.color = lightColors[i];
-            auto rotateLight = glm::rotate(glm::mat4(1.f), (i*glm::two_pi<float>()) / lightColors.size(), glm::vec3(0.f, -1.f, 0.f));
-            pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-        }*/
     }
 
     void app::loadTextures()

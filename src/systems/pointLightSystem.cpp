@@ -75,21 +75,24 @@ namespace engine
 
     void pointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
     {
-        auto rotateLight = glm::rotate(glm::mat4(1.f), frameInfo.frameTime/10, glm::vec3(1.f, -0.f, 0.f)); // turn around x : -1 on z = west, +1 on z = east for the sun, we can change the angle to change the speed of the sun and moon 
+        auto rotateLight = glm::rotate(glm::mat4(1.f), frameInfo.frameTime/10, glm::vec3(1.f, 0.f, 0.f)); 
+        // turn around x : -1 on z = west, +1 on z = east for the sun, we can change the angle to change the speed of the sun and moon 
         int lightIndex = 0;
         for (auto& kv: frameInfo.gameObjects)
         {
-            auto& gameObject = kv.second;
-            if (gameObject.pointLight == nullptr) continue;
-
             assert(lightIndex < MAX_LIGHTS && "Too many lights!");
 
-            // update light position
-            gameObject.transform.translation = glm::vec3(rotateLight * glm::vec4(gameObject.transform.translation, 1.0f));
+            auto& gameObject = kv.second;
+            if (gameObject.pointLight == nullptr) continue;
+            if (lightIndex <= 1)
+            {
+                // update psotion of the sun and moon
+                gameObject.transform.translation = glm::vec3(rotateLight * glm::vec4(gameObject.transform.translation, 1.0f));
 
-            ubo.pointLights[lightIndex].position = glm::vec4(gameObject.transform.translation, 1.0f);
-            ubo.pointLights[lightIndex].color = glm::vec4(gameObject.color, gameObject.pointLight->lightIntensity);
-            lightIndex++;
+                ubo.pointLights[lightIndex].position = glm::vec4(gameObject.transform.translation, 1.0f);
+                ubo.pointLights[lightIndex].color = glm::vec4(gameObject.color, gameObject.pointLight->lightIntensity);
+                lightIndex++;
+            }
             
         }
         ubo.numLights = lightIndex;
@@ -130,6 +133,8 @@ namespace engine
 
             PointLightPushConstants push{};
             push.position = glm::vec4(gameObject.transform.translation, 1.0f);
+            push.position.x += frameInfo.myCamera.getPosition().x;
+            push.position.z += frameInfo.myCamera.getPosition().z;
             push.color = glm::vec4(gameObject.color, gameObject.pointLight->lightIntensity);
             push.radius = gameObject.transform.scale.x;
 
