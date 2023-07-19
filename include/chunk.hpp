@@ -6,18 +6,22 @@
 #include "vulkanBuffer.hpp"
 #include "gameObject.hpp"
 
+#include <PerlinNoise.hpp>
+
 #include <unordered_map>
 #include <vector>
 #include <memory>
 
 #define CHUNK_SIZE 16
+#define CHUNK_MAX_Y 40
+#define CHUNK_MIN_Y 40
 
 namespace engine
 {
     class chunk
     {
         public:
-            chunk(engineDevice& device, int x, int z);
+            chunk(engineDevice& device, int x, int z, std::shared_ptr<siv::PerlinNoise> perlin);
             ~chunk() = default;
 
             void addBlock(int worldX, int worldY, int worldZ, BlockType blockType);
@@ -47,6 +51,7 @@ namespace engine
         private:
             unsigned long int hashFunction(int x, int y, int z);
             int x, z;
+            std::shared_ptr<siv::PerlinNoise> perlin{nullptr};
             std::unordered_map<unsigned long int, block> blocks;
 
             engineDevice& device;
@@ -61,10 +66,15 @@ namespace engine
             void updateVertexBuffers(const std::vector<block::Vertex>& vertices);
             void updateIndexBuffers(const std::vector<uint32_t>& indices);
 
+            void generateFlatWorld();
+            void generateRandomWorld();
+
             void getChunkMesh(
                 std::unordered_map<block::Vertex, uint32_t>& uniqueVertices, 
                 std::vector<block::Vertex>& vertices, 
                 std::vector<uint32_t>& indices);
+
+            void generateTree(int x, int y, int z);
 
     };
 }

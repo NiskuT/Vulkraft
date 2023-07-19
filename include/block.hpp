@@ -71,6 +71,7 @@ namespace engine
 
             void updateBlockFacesVisible(std::vector<std::shared_ptr<chunk>>& chunks);
             void checkFaceInChunk(std::shared_ptr<chunk>& chunk);
+            BlockType getBlockType() { return blockType; };
 
             void addVerticesToBuffer(
                 std::unordered_map<Vertex, uint32_t>& uniqueVertices, 

@@ -45,7 +45,7 @@ namespace engine
 
         loadGameObjects();
         loadTextures();
-        myWorld = std::make_shared<visibleWorld>(device);
+        myWorld = std::make_shared<visibleWorld>(device, 1);
 
     }
 
