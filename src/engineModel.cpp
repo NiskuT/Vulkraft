@@ -10,6 +10,8 @@
 #include <cstring>
 #include <unordered_map>
 
+//create a seed for the generation of the world 
+//combines the position, color, normal vector and uv mapping of a vertex to compute the seed 
 namespace std
 {
     template <>
@@ -26,14 +28,20 @@ namespace std
 
 namespace engine 
 {
+    // engineModel class : load a 3D model from a file and create and manipulate buffers of vertices and indices to describe it
+
+    // constructor, takes 2 parameters : 
+    // an engineDevice : <TO DO>
+    // the Builder struct : create two empty vectors for vertices and indices, loads a file for a 3D object
     engineModel::engineModel(engineDevice& device, const engineModel::Builder& builder) : device{device}
     {
         createVertexBuffers(builder.vertices);
         createIndexBuffers(builder.indices);
     }
 
-    engineModel::~engineModel() { }
+    engineModel::~engineModel() { } // destructor 
 
+    // take a vector of vertices and create a buffer out of it 
     void engineModel::createVertexBuffers(const std::vector<Vertex>& vertices)
     {
         vertexCount = static_cast<uint32_t>(vertices.size());
@@ -62,6 +70,7 @@ namespace engine
         device.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer->getBuffer(), bufferSize);
     }
 
+    // take a vector of indices and create a buffer out of it 
     void engineModel::createIndexBuffers(const std::vector<uint32_t>& indices)
     {
         indexCount = static_cast<uint32_t>(indices.size());
@@ -92,6 +101,8 @@ namespace engine
         device.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
     }
 
+    // <TO DO>
+    // if a index buffer is already defined : calls vkCmdDrawIndexed() otherwise calls vkCmdDraw()
     void engineModel::draw(VkCommandBuffer commandBuffer)
     {
         if (hasIndexBuffer)
@@ -102,6 +113,8 @@ namespace engine
         }
     }
 
+    // bind together the buffers of vertices and of indexes by first binding the buffer of vertices 
+    // with its offsets, and then binding the result of it with the buffer of indexes if it exists. 
     void engineModel::bind(VkCommandBuffer commandBuffer)
     {
         VkBuffer buffers[] = {vertexBuffer->getBuffer()};
@@ -114,6 +127,7 @@ namespace engine
         }
     }
 
+    // The returned vector is used to describe the vertices attributes 
     std::vector<VkVertexInputBindingDescription> engineModel::Vertex::getBindingDescriptions()
     {
         std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
@@ -193,9 +207,12 @@ namespace engine
                 {
                     vertex.uv = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
-                        attrib.texcoords[2 * index.texcoord_index + 1]
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                     };
+                    
                 }
+
+                
 
                 if (uniqueVertices.count(vertex) == 0)
                 {

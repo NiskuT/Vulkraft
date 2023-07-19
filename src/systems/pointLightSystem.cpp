@@ -75,7 +75,7 @@ namespace engine
 
     void pointLightSystem::update(FrameInfo& frameInfo, GlobalUbo& ubo)
     {
-        auto rotateLight = glm::rotate(glm::mat4(1.f), frameInfo.frameTime, glm::vec3(0.f, -1.f, 0.f));
+        auto rotateLight = glm::rotate(glm::mat4(1.f), frameInfo.frameTime/10, glm::vec3(1.f, -0.f, 0.f)); // turn around x : -1 on z = west, +1 on z = east for the sun, we can change the angle to change the speed of the sun and moon 
         int lightIndex = 0;
         for (auto& kv: frameInfo.gameObjects)
         {

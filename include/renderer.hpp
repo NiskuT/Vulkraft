@@ -11,16 +11,21 @@
 
 namespace engine 
 {
+    /*
+    Contains the rendering operations : 
+    manages creation and destruction of command buffers, swap chain, frames
+    */
     class renderer
     {
         public:
-
+            // constructor, destructor, copy...
             renderer(gameWindow& window, engineDevice& device);
             ~renderer();
 
             renderer(const renderer&) = delete;
             void operator=(const renderer&) = delete;
 
+            // some helper functions of obtain information about the current state
             VkRenderPass getSwapChainRenderPass() const { return p_swapChain->getRenderPass(); }
             float getAspectRatio() const { return p_swapChain->extentAspectRatio(); }
             bool isFrameInProgress() const { return isFrameStarted; }
@@ -41,14 +46,14 @@ namespace engine
             }
 
         private:
-            void createCommandBuffers();
-            void freeCommandBuffers();
+            void createCommandBuffers(); // create the command buffers used for rendering 
+            void freeCommandBuffers(); // free them
             void recreateSwapChain();
 
             gameWindow& window;
             engineDevice& device;
-            std::unique_ptr<swapChain> p_swapChain;
-            std::vector<VkCommandBuffer> commandBuffers;    
+            std::unique_ptr<swapChain> p_swapChain; // unique pointer to the Swap chain object
+            std::vector<VkCommandBuffer> commandBuffers; // vector holding the command buffers
 
             uint32_t currentImageIndex;
             int currentFrameIndex{0};

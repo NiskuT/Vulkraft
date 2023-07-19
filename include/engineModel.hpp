@@ -35,6 +35,7 @@ namespace engine
             }
         };
 
+        // create vectors to store the vertices and indices related to a loaded 3D model 
         struct Builder
         {
             std::vector<Vertex> vertices{};

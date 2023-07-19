@@ -159,17 +159,17 @@ namespace engine
     void app::loadGameObjects()
     {
         //we create the first object of the scene : the player 
-        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, MODEL_PATH "smallSteve.obj");
+        std::shared_ptr<engineModel> SteveModel = engineModel::createModelFromFile(device, MODEL_PATH "smallSteveWithTexture.obj");
         auto Steve = gameObject::createGameObject();
         Steve.model = SteveModel;
         // first transformations on steve in order to place him in the scene 
-        Steve.transform.translation = {0.0f, 0.5f, 1.0f};
+        Steve.transform.translation = {0.0f, -0.2f, 1.0f};
         Steve.transform.rotation = {0,0,glm::radians(180.0f)}; 
-        Steve.transform.scale = glm::vec3(0.3f);
+        Steve.transform.scale = glm::vec3(0.15f);
         //place him in the scene
         gameObjects.emplace(Steve.getId(), std::move(Steve));
 
-        /*gameObjModel = engineModel::createModelFromFile(device, "C:\\Users\\qjupi\\Desktop\\Vulkraft\\models\\quad.obj");
+        /*gameObjModel = engineModel::createModelFromFile(device, MODEL_PATH "quad.obj");
         auto floor = gameObject::createGameObject();
         floor.model = FloorModel;
         floor.transform.translation = {0.f, .5f, 0.f};
@@ -186,19 +186,32 @@ namespace engine
             {1.f, 1.f, 1.f}
         };
 
-        for (int i = 0; i < lightColors.size(); i++)
+
+        auto sun = gameObject::makePointLight(2.0f, 1.0f);
+        sun.color = {1.0f, 1.0f, 0.5f}; // yellowish 1 1 0.5
+        //auto rotateSun = glm::rotate(glm::mat4(1.f), glm::radians(0.0f), glm::vec3(0.f, 0.f, 1.f));
+        sun.transform.translation = glm::vec3(0.f, 0.0f, 10.0f);
+        gameObjects.emplace(sun.getId(), std::move(sun));
+
+        auto moon = gameObject::makePointLight(2.0f, 1.0f);
+        moon.color = {0.7f, 0.7f, 1.0f}; // blueish 0.7 0.7 1
+        //auto rotateMoon = glm::rotate(glm::mat4(1.f), glm::radians(270.0f), glm::vec3(0.f, 0.f, 1.f));
+        moon.transform.translation = glm::vec3(0.f, 0.0f, -10.0f); // opposite positions of start for sun and moon
+        gameObjects.emplace(moon.getId(), std::move(moon));
+
+        /*for (int i = 0; i < lightColors.size(); i++)
         {
-            auto pointLight = gameObject::makePointLight(0.2f);
+            auto pointLight = gameObject::makePointLight(0.5f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(glm::mat4(1.f), (i*glm::two_pi<float>()) / lightColors.size(), glm::vec3(0.f, -1.f, 0.f));
             pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
             gameObjects.emplace(pointLight.getId(), std::move(pointLight));
-        }
+        }*/
     }
 
     void app::loadTextures()
     {
-        auto textureFilepath = TEXTURE_PATH "minecraftGrass.png";
+        auto textureFilepath = TEXTURE_PATH "TextureSteve.png";
         textures = engineTexture::createTextureFromFile(device, textureFilepath);
 
         auto texturePath = TEXTURE_PATH "blockTextureAlpha.png";

@@ -8,12 +8,13 @@
 
 namespace engine {
 
+// to manage presentation of the images 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
 };
-
+// to manage the queues supported by a device 
 struct QueueFamilyIndices {
     uint32_t graphicsFamily;
     uint32_t presentFamily;
@@ -25,12 +26,13 @@ struct QueueFamilyIndices {
 class engineDevice {
     
 public:
+// to handle in case of debug mode 
 #ifdef NDEBUG
     const bool enableValidationLayers = false;
 #else
     const bool enableValidationLayers = true;
 #endif
-
+// constructors, destructors, copy ... handling 
     engineDevice(gameWindow &window);
     ~engineDevice();
 
@@ -40,12 +42,14 @@ public:
     engineDevice(engineDevice &&) = delete;
     engineDevice& operator=(engineDevice &&) = delete;
 
+// return private attributes of the class
     VkCommandPool getCommandPool() { return commandPool; }
     VkDevice device() { return device_; }
     VkSurfaceKHR surface() { return surface_; }
     VkQueue graphicsQueue() { return graphicsQueue_; }
     VkQueue presentQueue() { return presentQueue_; }
 
+// functions for vulkan swap chain support
     SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
@@ -65,7 +69,6 @@ public:
     void copyBufferToImage(
             VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-
     void createImageWithInfo(
             const VkImageCreateInfo &imageInfo,
             VkMemoryPropertyFlags properties,
@@ -82,7 +85,7 @@ private:
     void createLogicalDevice();
     void createCommandPool();
 
-    // helper functions
+    // helper functions for the device selection and initialization 
     bool isDeviceSuitable(VkPhysicalDevice device);
     std::vector<const char *> getRequiredExtensions();
     bool checkValidationLayerSupport();
@@ -100,8 +103,8 @@ private:
 
     VkDevice device_;
     VkSurfaceKHR surface_;
-    VkQueue graphicsQueue_;
-    VkQueue presentQueue_;
+    VkQueue graphicsQueue_; // queue for the commands for graphic operations (render geoetry, perform vertex & fragment shading, shaders...)
+    VkQueue presentQueue_; // = swap chain queue = presentation queue : display the images on the device's window
 
     const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
     const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
