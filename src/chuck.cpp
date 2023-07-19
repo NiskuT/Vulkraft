@@ -76,8 +76,12 @@ namespace engine
                         addBlock(x * CHUNK_SIZE + i, k, z * CHUNK_SIZE + j, BlockType::DIRT);
                     }
                     addBlock(x * CHUNK_SIZE + i, height, z * CHUNK_SIZE + j, BlockType::GRASS);
+                    if (rand() % 1000 < 5)
+                    {
+                        generateTree(x * CHUNK_SIZE + i, height - 1, z * CHUNK_SIZE + j);
+                    }
                 } else {
-                    float height = ((1-HEIGHT_DIFF)*HF + HEIGHT_DIFF * BF);// * std::pow((BF + 1.f), SLOPE);
+                    float height = ((1-HEIGHT_DIFF)*HF + HEIGHT_DIFF * BF);
 
                     if (height > 0.f)
                     {
@@ -116,8 +120,8 @@ namespace engine
 
     void chunk::generateTree(int x, int y, int z)
     {
-        const int TREE_HEIGHT = 5;
-        const int TREE_TOP_LEAVES = 2;
+        const int TREE_HEIGHT = 7;
+        const int TREE_TOP_LEAVES = 3;
         for (int i = 0; i < TREE_HEIGHT; ++i)
         {
             addBlock(x, y - i, z, BlockType::WOOD);
@@ -128,7 +132,7 @@ namespace engine
 
         for (int dy = leafStart; dy > leafEnd; --dy)
         {
-            int leafRadius = 2 - (dy - leafStart);
+            int leafRadius = TREE_TOP_LEAVES + (dy - leafStart);
 
             for (int dx = -leafRadius; dx <= leafRadius; ++dx)
             {
