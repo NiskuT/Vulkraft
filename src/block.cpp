@@ -26,7 +26,7 @@ namespace engine
 
         if (TOP_FACE_VISIBLE(blockFacesVisible) != 0)
         {
-            auto norm = glm::vec3{0.f, 1.f, 0.f};
+            auto norm = glm::vec3{0.f, -1.f, 0.f};
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ}, norm, {TOP_TX * txUnitX, textureY}});
             pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY, worldZ}, norm, {1.0f, textureY}});
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY, worldZ + 1.f}, norm, {TOP_TX * txUnitX, textureY + txUnitY}});
@@ -37,7 +37,7 @@ namespace engine
         }
         if (BOTTOM_FACE_VISIBLE(blockFacesVisible) != 0)
         {
-            auto norm = glm::vec3{0.f, -1.f, 0.f};
+            auto norm = glm::vec3{0.f, 1.f, 0.f};
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ}, norm, {0.f, textureY}});
             pushVertex(uniqueVertices, vertices, indices, {{worldX + 1.f, worldY + 1.f, worldZ}, norm, {txUnitX, textureY}});
             pushVertex(uniqueVertices, vertices, indices, {{worldX, worldY + 1.f, worldZ + 1.f}, norm, {0.f, textureY + txUnitY}});

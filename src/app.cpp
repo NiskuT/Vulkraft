@@ -179,11 +179,11 @@ namespace engine
         gameObjects.emplace(floor.getId(), std::move(floor));*/
 
 
-        auto sun = gameObject::makePointLight(2.0f, 3.0f, {1.0f, 1.0f, 0.5f});
+        auto sun = gameObject::makePointLight(.8f, 3.0f, {1.0f, 1.0f, 0.5f});
         sun.transform.translation = glm::vec3(0.f, 0.0f, (float)MAX_SUN_HEIGHT);
         gameObjects.emplace(sun.getId(), std::move(sun));
 
-        auto moon = gameObject::makePointLight(2.0f, 1.0f, {0.7f, 0.7f, 1.0f});
+        auto moon = gameObject::makePointLight(.1f, 1.0f, {0.7f, 0.7f, 1.0f});
         moon.transform.translation = glm::vec3(0.f, 0.0f, -1.f * MAX_SUN_HEIGHT); // opposite positions of start for sun and moon
         gameObjects.emplace(moon.getId(), std::move(moon));
 

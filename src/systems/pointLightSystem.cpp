@@ -93,7 +93,21 @@ namespace engine
                 gameObject.transform.translation = glm::vec3(rotateLight * glm::vec4(gameObject.transform.translation, 1.0f));
 
                 ubo.pointLights[lightIndex].position = glm::vec4(gameObject.transform.translation, 1.0f);
-                ubo.pointLights[lightIndex].color = glm::vec4(gameObject.color, gameObject.pointLight->lightIntensity);
+                ubo.pointLights[lightIndex].position.x += frameInfo.myCamera.getPosition().x;
+                ubo.pointLights[lightIndex].position.z += frameInfo.myCamera.getPosition().z;
+                if (ubo.pointLights[lightIndex].position.y > 5) ubo.pointLights[lightIndex].position.y = 5;
+                
+                float sunHeight = getSunHeight(frameInfo);
+                if (sunHeight > 0.3) {
+                    ubo.pointLights[lightIndex].color = glm::vec4(gameObject.color, gameObject.pointLight->lightIntensity);
+                } else if (sunHeight > 0.1) {
+                    float t = (sunHeight - 0.1f) / (0.3f - 0.1f);
+                    glm::vec3 color = glm::mix(getSkyColor(sunHeight), gameObject.color, t);
+                    ubo.pointLights[lightIndex].color = glm::vec4(color, gameObject.pointLight->lightIntensity);
+                } else {
+                    ubo.pointLights[lightIndex].color = glm::vec4(getSkyColor(sunHeight), gameObject.pointLight->lightIntensity);
+                }
+                
                 lightIndex++;
             }
         }
