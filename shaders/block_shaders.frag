@@ -50,10 +50,8 @@ void main()
         float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0);
 
         attenuation *= light.color.w;
-        if (i == 0)
+        if (i <= 1)
         {
-            attenuation = light.color.w;            
-        } else if (i == 1) {
             attenuation = light.color.w;            
         }
         vec3 intensity = light.color.xyz * attenuation;
