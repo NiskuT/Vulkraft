@@ -33,7 +33,7 @@ layout(binding = 1) uniform sampler2D texSampler;
 
 void main()
 {
-    /*vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
+    vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
     vec3 specularLight = vec3(0.0);
     vec3 surfaceNormal = normalize(fragNormalWorld);
 
@@ -47,10 +47,14 @@ void main()
         float attenuation = 1.0 / dot(directionToLight, directionToLight);
         directionToLight = normalize(directionToLight);
 
+        float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0);
 
-        float cosAngIncidence = max(dot(surfaceNormal, directionToLight), 0.0);
-        vec3 intensity = light.color.xyz * light.color.w * attenuation;
-
+        attenuation *= light.color.w;
+        if (i <= 1)
+        {
+            attenuation = light.color.w;            
+        }
+        vec3 intensity = light.color.xyz * attenuation;
         diffuseLight += intensity * cosAngIncidence;
 
         // specular component lighting
@@ -60,8 +64,8 @@ void main()
         blinnTerm = pow(blinnTerm, 10.0); // higher values -> sharper specular highlight
         specularLight += intensity * blinnTerm;
     }
+    diffuseLight = clamp(diffuseLight, 0.0, 1.0);
     
-    vec3 finalColor = texture(texSampler, fragUv).rbg; */
-    //outColor = vec4(diffuseLight* finalColor + specularLight * finalColor, 1.0);
-    outColor = texture(texSampler, fragUv);
+    vec3 finalColor = texture(texSampler, fragUv).rgb;
+    outColor = vec4(diffuseLight* finalColor + specularLight * finalColor, 1.0);
 }

@@ -9,6 +9,8 @@
 #include <vector>
 #include <cassert>
 
+#include <glm/glm.hpp>
+
 namespace engine 
 {
     /*
@@ -37,7 +39,7 @@ namespace engine
 
             VkCommandBuffer beginFrame();
             void endFrame();
-            void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+            void beginSwapChainRenderPass(VkCommandBuffer commandBuffer, glm::vec3 clearColor);
             void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 
             int getFrameIndex() const { 
