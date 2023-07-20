@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 
+#define MAX_SUN_HEIGHT 30
+
 namespace engine 
 {
     class pointLightSystem
@@ -23,6 +25,9 @@ namespace engine
 
             void update(FrameInfo& frameInfo, GlobalUbo& ubo);
             void render(FrameInfo& frameInfo);
+
+            static glm::vec3 getSkyColor(float sunHeight);
+            float getSunHeight(FrameInfo &frameInfo);
 
         private:
             void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

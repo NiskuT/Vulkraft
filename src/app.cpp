@@ -136,13 +136,15 @@ namespace engine
                 ubo.view = myCamera.getViewMatrix();
                 ubo.viewInverse = myCamera.getViewInverseMatrix();
                 pointLightSystem.update(frameInfo, ubo);
+                float sunHeight = pointLightSystem.getSunHeight(frameInfo);
+                glm::vec3 skyColor = pointLightSystem::getSkyColor(sunHeight);
                 auto position = myCamera.getPosition();
                 myWorld->updateWorldMesh(static_cast<int>(position.x * 10), static_cast<int>(position.z * 10), 4); // x, z, render distance
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 //render
-                engineRenderer.beginSwapChainRenderPass(commandBuffer);
+                engineRenderer.beginSwapChainRenderPass(commandBuffer, skyColor);
 
                 // order matters
                 renderSystem.renderGameObjects(frameInfo);
@@ -178,11 +180,11 @@ namespace engine
 
 
         auto sun = gameObject::makePointLight(2.0f, 3.0f, {1.0f, 1.0f, 0.5f});
-        sun.transform.translation = glm::vec3(0.f, 0.0f, 30.0f);
+        sun.transform.translation = glm::vec3(0.f, 0.0f, (float)MAX_SUN_HEIGHT);
         gameObjects.emplace(sun.getId(), std::move(sun));
 
         auto moon = gameObject::makePointLight(2.0f, 1.0f, {0.7f, 0.7f, 1.0f});
-        moon.transform.translation = glm::vec3(0.f, 0.0f, -30.0f); // opposite positions of start for sun and moon
+        moon.transform.translation = glm::vec3(0.f, 0.0f, -1.f * MAX_SUN_HEIGHT); // opposite positions of start for sun and moon
         gameObjects.emplace(moon.getId(), std::move(moon));
 
     }
